@@ -37,7 +37,7 @@ const Index = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <Header showBackButton={true} />
+      <Header showBackButton={true} deceasedInfo={deceasedInfo} />
       <div className="flex flex-1 overflow-hidden">
         {/* Editor Sidebar - 30% */}
         <div className="w-[30%]">
