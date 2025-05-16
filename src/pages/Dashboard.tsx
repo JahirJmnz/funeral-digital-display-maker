@@ -31,14 +31,16 @@ export default function Dashboard() {
     navigate(`/edit/${screenId}`);
   };
 
-  // Función para eliminar una pantalla
-  const handleDelete = (screenId: string) => {
+  // Función para eliminar el contenido de una pantalla
+  const handleDeleteContent = (screenId: string) => {
     toast({
-      title: "Pantalla eliminada",
-      description: "La pantalla ha sido eliminada correctamente",
+      title: "Contenido eliminado",
+      description: "La señalización digital ha sido eliminada de la pantalla.",
     });
     
-    setScreens(screens.filter(screen => screen.id !== screenId));
+    setScreens(screens.map(screen => 
+      screen.id === screenId ? { ...screen, hasContent: false } : screen
+    ));
   };
 
   // Función para crear contenido nuevo
@@ -55,17 +57,24 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Administra la señalización digital en las pantallas de la funeraria</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {screens.map((screen) => (
             <Card key={screen.id} className="overflow-hidden">
-              <div className="h-32 bg-gray-200 flex items-center justify-center">
-                <Monitor className="h-12 w-12 text-gray-400" />
+              <div className="h-48 bg-gray-200 flex items-center justify-center">
+                <Monitor className="h-16 w-16 text-gray-400" />
               </div>
-              <CardContent className="p-4">
-                <h3 className="font-medium">{screen.name}</h3>
+              <CardContent className="p-5">
+                <h3 className="text-lg font-medium">{screen.name}</h3>
                 <p className="text-sm text-muted-foreground">{screen.location}</p>
+                {screen.hasContent && (
+                  <div className="mt-2">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Contenido activo
+                    </span>
+                  </div>
+                )}
               </CardContent>
-              <CardFooter className="bg-gray-50 px-4 py-3 border-t">
+              <CardFooter className="bg-gray-50 px-5 py-4 border-t">
                 {screen.hasContent ? (
                   <div className="flex w-full gap-2">
                     <Button 
@@ -81,10 +90,10 @@ export default function Dashboard() {
                       variant="outline" 
                       size="sm" 
                       className="flex-1 text-destructive hover:text-destructive"
-                      onClick={() => handleDelete(screen.id)}
+                      onClick={() => handleDeleteContent(screen.id)}
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
-                      Eliminar
+                      Eliminar contenido
                     </Button>
                   </div>
                 ) : (

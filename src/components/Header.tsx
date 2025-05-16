@@ -1,5 +1,5 @@
 
-import { Cog } from "lucide-react";
+import { Cog, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +27,8 @@ export default function Header({ showBackButton }: HeaderProps) {
     <header className="flex items-center justify-between border-b border-border px-6 py-3 bg-white">
       <div className="flex items-center gap-3">
         {showBackButton && (
-          <Button variant="outline" size="sm" onClick={handleBack}>
-            Volver al dashboard
+          <Button variant="ghost" size="icon" onClick={handleBack} className="mr-2">
+            <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
         <h1 className="text-xl font-medium">
