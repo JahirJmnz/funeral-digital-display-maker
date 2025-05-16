@@ -23,7 +23,9 @@ export default function Dashboard() {
     { id: "screen1", name: "Pantalla Lobby Principal", location: "Recepción", hasContent: true },
     { id: "screen2", name: "Pantalla Sala Esperanza", location: "Sala Esperanza", hasContent: false },
     { id: "screen3", name: "Pantalla Sala Paz", location: "Sala Paz", hasContent: true },
-    { id: "screen4", name: "Nueva Pantalla", location: "Sin asignar", hasContent: false }
+    { id: "screen4", name: "Pantalla Sala Serenidad", location: "Sala Serenidad", hasContent: false },
+    { id: "screen5", name: "Pantalla Capilla", location: "Capilla", hasContent: true },
+    { id: "screen6", name: "Pantalla Cafetería", location: "Cafetería", hasContent: false }
   ]);
 
   // Función para editar una pantalla (navegar al editor)
@@ -57,15 +59,15 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Administra la señalización digital en las pantallas de la funeraria</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {screens.map((screen) => (
             <Card key={screen.id} className="overflow-hidden">
-              <div className="h-48 bg-gray-200 flex items-center justify-center">
-                <Monitor className="h-16 w-16 text-gray-400" />
+              <div className="h-36 bg-gray-200 flex items-center justify-center">
+                <Monitor className="h-12 w-12 text-gray-400" />
               </div>
-              <CardContent className="p-5">
-                <h3 className="text-lg font-medium">{screen.name}</h3>
-                <p className="text-sm text-muted-foreground">{screen.location}</p>
+              <CardContent className="p-4">
+                <h3 className="text-base font-medium">{screen.name}</h3>
+                <p className="text-xs text-muted-foreground">{screen.location}</p>
                 {screen.hasContent && (
                   <div className="mt-2">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -74,7 +76,7 @@ export default function Dashboard() {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="bg-gray-50 px-5 py-4 border-t">
+              <CardFooter className="bg-gray-50 px-4 py-3 border-t">
                 {screen.hasContent ? (
                   <div className="flex w-full gap-2">
                     <Button 
