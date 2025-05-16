@@ -1,11 +1,15 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import EditorSidebar from '@/components/EditorSidebar';
 import PreviewDisplay from '@/components/PreviewDisplay';
 import { DeceasedInfo } from '@/types/deceased';
 
 const Index = () => {
+  const { screenId } = useParams<{ screenId: string }>();
+  const navigate = useNavigate();
+  
   // Initialize with default values
   const [deceasedInfo, setDeceasedInfo] = useState<DeceasedInfo>({
     name: "Juan Pérez Rodríguez",
@@ -24,9 +28,16 @@ const Index = () => {
     }));
   };
 
+  // Effect to check if screen ID is valid
+  useEffect(() => {
+    if (!screenId) {
+      navigate('/');
+    }
+  }, [screenId, navigate]);
+
   return (
     <div className="flex flex-col h-screen">
-      <Header />
+      <Header showBackButton={true} />
       <div className="flex flex-1 overflow-hidden">
         {/* Editor Sidebar - 30% */}
         <div className="w-[30%]">
