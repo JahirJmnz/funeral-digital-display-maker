@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -19,15 +18,27 @@ const Screen = ({ texture, position, rotation, size = [3, 1.7] }: {
   size?: [number, number];
 }) => {
   console.log("Screen: Renderizando con textura:", !!texture);
+  console.log("Screen: Texture image dimensions:", texture?.image?.width, texture?.image?.height);
+  
+  const meshRef = React.useRef<THREE.Mesh>(null);
+  
+  React.useEffect(() => {
+    if (meshRef.current && texture) {
+      texture.needsUpdate = true;
+      meshRef.current.material.needsUpdate = true;
+      console.log("Screen: Forzando actualización de material y textura");
+    }
+  }, [texture]);
   
   return (
-    <mesh position={position} rotation={rotation || [0, 0, 0]}>
+    <mesh ref={meshRef} position={position} rotation={rotation || [0, 0, 0]}>
       <planeGeometry args={[size[0], size[1]]} />
       <meshBasicMaterial 
         map={texture || undefined}
         color={texture ? 'white' : '#333333'}
         side={THREE.DoubleSide}
         transparent={false}
+        toneMapped={false}
       />
     </mesh>
   );
@@ -105,6 +116,7 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
     console.log("RoomPreview3D: Estado de texture actualizado:", !!texture);
     if (texture) {
       console.log("RoomPreview3D: Texture image data:", texture.image);
+      console.log("RoomPreview3D: Texture ready:", texture.image?.complete !== false);
     }
   }, [texture]);
   
