@@ -13,11 +13,16 @@ export default function PreviewDisplay({ deceasedInfo, onImageLoad }: PreviewDis
   const placeholderImage = "/placeholder.svg";
 
   React.useEffect(() => {
-    // Si no hay foto, consideramos la "imagen" cargada inmediatamente.
-    if (!deceasedInfo.photoUrl && onImageLoad) {
-      onImageLoad();
-    }
-  }, [deceasedInfo.photoUrl, onImageLoad]);
+    // Always trigger onImageLoad after component mounts and renders
+    const timer = setTimeout(() => {
+      console.log("PreviewDisplay: Triggering onImageLoad callback");
+      if (onImageLoad) {
+        onImageLoad();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [onImageLoad]);
   
   // Format the date and time
   const formatDate = (dateString: string) => {
@@ -30,6 +35,20 @@ export default function PreviewDisplay({ deceasedInfo, onImageLoad }: PreviewDis
       day: 'numeric' 
     };
     return date.toLocaleDateString('es-ES', options);
+  };
+
+  const handleImageLoad = () => {
+    console.log("PreviewDisplay: Image loaded successfully");
+    if (onImageLoad) {
+      onImageLoad();
+    }
+  };
+
+  const handleImageError = () => {
+    console.log("PreviewDisplay: Image failed to load, using placeholder");
+    if (onImageLoad) {
+      onImageLoad();
+    }
   };
 
   return (
@@ -55,8 +74,8 @@ export default function PreviewDisplay({ deceasedInfo, onImageLoad }: PreviewDis
                   src={deceasedInfo.photoUrl || placeholderImage} 
                   alt="Fotografía del fallecido" 
                   className="absolute inset-0 w-full h-full object-cover"
-                  onLoad={() => onImageLoad && onImageLoad()}
-                  onError={() => onImageLoad && onImageLoad()}
+                  onLoad={handleImageLoad}
+                  onError={handleImageError}
                 />
               </div>
             </div>

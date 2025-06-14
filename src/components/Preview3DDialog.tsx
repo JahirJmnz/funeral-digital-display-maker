@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Dialog,
@@ -44,29 +45,35 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
       setIsCapturing(true);
       console.log("=== Imagen cargada, comenzando captura desde el DOM oculto... ===");
       
-      const previewElement = previewRef.current?.querySelector('.memorial-display') as HTMLElement;
-      if (previewElement) {
-        html2canvas(previewElement, {
-          backgroundColor: '#2D1B69',
-          logging: true,
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          width: previewElement.offsetWidth,
-          height: previewElement.offsetHeight,
-        }).then(canvas => {
-          const imageData = canvas.toDataURL('image/png');
-          console.log("Imagen capturada exitosamente. DataURL length:", imageData.length);
-          setPreviewImage(imageData);
+      // Add a small delay to ensure the hidden element is fully rendered
+      setTimeout(() => {
+        const previewElement = previewRef.current?.querySelector('.memorial-display') as HTMLElement;
+        if (previewElement) {
+          console.log("Preview element found:", previewElement);
+          console.log("Element dimensions:", previewElement.offsetWidth, "x", previewElement.offsetHeight);
+          
+          html2canvas(previewElement, {
+            backgroundColor: '#2D1B69',
+            logging: true,
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            width: previewElement.offsetWidth,
+            height: previewElement.offsetHeight,
+          }).then(canvas => {
+            const imageData = canvas.toDataURL('image/png');
+            console.log("Imagen capturada exitosamente. DataURL length:", imageData.length);
+            setPreviewImage(imageData);
+            setIsCapturing(false);
+          }).catch(error => {
+            console.error("Error capturando la vista previa:", error);
+            setIsCapturing(false);
+          });
+        } else {
+          console.error("No se encontró el elemento .memorial-display en el ref oculto.");
           setIsCapturing(false);
-        }).catch(error => {
-          console.error("Error capturando la vista previa:", error);
-          setIsCapturing(false);
-        });
-      } else {
-        console.error("No se encontró el elemento .memorial-display en el ref oculto.");
-        setIsCapturing(false);
-      }
+        }
+      }, 500);
     }
   }, [open, imageLoaded, isCapturing, previewImage]);
   
