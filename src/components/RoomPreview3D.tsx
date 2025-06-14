@@ -1,3 +1,4 @@
+
 import React, { useRef, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, useTexture } from '@react-three/drei';
@@ -9,16 +10,44 @@ interface RoomPreview3DProps {
 
 // The screen component that displays the signage content
 const Screen = ({ imageUrl }: { imageUrl: string | null }) => {
-  // Use the useTexture hook from drei. It handles loading and suspense.
-  const texture = useTexture(imageUrl || '/placeholder.svg');
+  console.log("Screen component received imageUrl:", imageUrl ? "Image provided" : "No image");
+  
+  // Use different approach for texture loading
+  const [texture, setTexture] = React.useState<THREE.Texture | null>(null);
+  
+  React.useEffect(() => {
+    if (imageUrl) {
+      console.log("Loading texture from imageUrl");
+      const loader = new THREE.TextureLoader();
+      loader.load(
+        imageUrl,
+        (loadedTexture) => {
+          console.log("Texture loaded successfully");
+          loadedTexture.flipY = false;
+          setTexture(loadedTexture);
+        },
+        undefined,
+        (error) => {
+          console.error("Error loading texture:", error);
+        }
+      );
+    } else {
+      console.log("No imageUrl provided, using placeholder");
+      const loader = new THREE.TextureLoader();
+      loader.load('/placeholder.svg', (loadedTexture) => {
+        setTexture(loadedTexture);
+      });
+    }
+  }, [imageUrl]);
 
   return (
     <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
       <planeGeometry args={[3, 1.7]} />
       <meshStandardMaterial 
         map={texture}
-        emissive={imageUrl ? "#ffffff" : "#000000"}
-        emissiveIntensity={imageUrl ? 0.2 : 0}
+        emissive={imageUrl ? "#222222" : "#000000"}
+        emissiveIntensity={imageUrl ? 0.3 : 0}
+        side={THREE.FrontSide}
       />
     </mesh>
   );
@@ -77,14 +106,16 @@ const CameraController = () => {
 };
 
 const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
+  console.log("RoomPreview3D received previewImage:", previewImage ? "Image provided" : "No image");
+  
   return (
     <div className="w-full h-[500px] bg-black">
       <Canvas shadows>
-        <Suspense fallback={null}>
+        <Suspense fallback={<div>Loading 3D scene...</div>}>
           <PerspectiveCamera makeDefault position={[0, 1.5, 1]} fov={60} />
           <CameraController />
-          <ambientLight intensity={0.3} />
-          <directionalLight position={[0, 3, 2]} intensity={1} castShadow />
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[0, 3, 2]} intensity={1.2} castShadow />
           <Room />
           <Screen imageUrl={previewImage} />
           <OrbitControls 

@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import {
   Dialog,
@@ -24,31 +23,48 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const [previewImage, setPreviewImage] = React.useState<string | null>(null);
+  const [isCapturing, setIsCapturing] = React.useState(false);
 
   React.useEffect(() => {
-    if (open && previewRef.current) {
-      // Small delay to ensure the DOM is ready for capture
+    if (open && previewRef.current && !isCapturing) {
+      setIsCapturing(true);
+      console.log("Starting image capture...");
+      
+      // Longer delay to ensure the DOM is fully rendered
       setTimeout(() => {
         if (previewRef.current) {
           html2canvas(previewRef.current, {
-            backgroundColor: null,
-            logging: false,
-            scale: 2, // Higher quality capture
+            backgroundColor: '#2D1B69',
+            logging: true,
+            scale: 1,
+            useCORS: true,
+            allowTaint: true,
+            width: 1920,
+            height: 1080,
           }).then(canvas => {
-            setPreviewImage(canvas.toDataURL());
+            const imageData = canvas.toDataURL('image/png');
+            console.log("Image captured successfully, data URL length:", imageData.length);
+            setPreviewImage(imageData);
+            setIsCapturing(false);
           }).catch(error => {
             console.error("Error capturing preview:", error);
+            setIsCapturing(false);
           });
         }
-      }, 100);
+      }, 500);
     }
-  }, [open]);
+  }, [open, isCapturing]);
 
   return (
     <>
       {/* Hidden div to capture the current preview */}
-      <div className="fixed left-[-9999px] top-0" ref={previewRef}>
+      <div 
+        className="fixed left-[-9999px] top-0" 
+        ref={previewRef}
+        style={{ position: 'fixed', left: '-9999px', top: '0' }}
+      >
         <div className="w-[1920px] h-[1080px] bg-funeral text-funeral-foreground p-12 flex flex-col font-sans">
+          
           <div className="flex justify-end mb-4">
             <div className="text-2xl font-medium tracking-wider opacity-70">FUNERARIA SAN JOSÉ</div>
           </div>
@@ -61,6 +77,7 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
                   src={deceasedInfo.photoUrl || "/placeholder.svg"} 
                   alt="Fotografía del fallecido" 
                   className="absolute inset-0 w-full h-full object-cover"
+                  crossOrigin="anonymous"
                 />
               </div>
             </div>
@@ -110,6 +127,8 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
             <DialogTitle className="text-xl">Vista previa en 3D</DialogTitle>
             <DialogDescription>
               Así se verá la señalización digital en la pantalla de la funeraria.
+              {isCapturing && " Capturando imagen..."}
+              {previewImage && " Imagen lista para mostrar."}
             </DialogDescription>
           </DialogHeader>
           <div className="p-6">
