@@ -6,6 +6,8 @@ import Header from '@/components/Header';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import PreviewDisplay from '@/components/PreviewDisplay';
+import { DeceasedInfo } from '@/types/deceased';
 
 interface Screen {
   id: string;
@@ -19,14 +21,23 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  // Sample deceased info for preview template
+  const sampleDeceasedInfo: DeceasedInfo = {
+    name: "Juan Pérez Rodríguez",
+    date: "2025-05-17",
+    time: "18:00",
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face",
+    room: "Sala Esperanza 3",
+    message: "Descanse en paz. Su recuerdo permanecerá siempre en nuestros corazones."
+  };
+  
   // Estado para las pantallas disponibles (simuladas)
   const [screens, setScreens] = useState<Screen[]>([
     { 
       id: "screen1", 
       name: "Pantalla Lobby Principal", 
       location: "Recepción", 
-      hasContent: true,
-      imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face"
+      hasContent: true
     },
     { 
       id: "screen2", 
@@ -38,29 +49,25 @@ export default function Dashboard() {
       id: "screen3", 
       name: "Pantalla Sala Paz", 
       location: "Sala Paz", 
-      hasContent: true,
-      imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=300&fit=crop&crop=face"
+      hasContent: true
     },
     { 
       id: "screen4", 
       name: "Pantalla Sala Serenidad", 
       location: "Sala Serenidad", 
-      hasContent: false,
-      imageUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=300&fit=crop&crop=face"
+      hasContent: false
     },
     { 
       id: "screen5", 
       name: "Pantalla Capilla", 
       location: "Capilla", 
-      hasContent: true,
-      imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop&crop=face"
+      hasContent: true
     },
     { 
       id: "screen6", 
       name: "Pantalla Cafetería", 
       location: "Cafetería", 
-      hasContent: false,
-      imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop&crop=face"
+      hasContent: false
     }
   ]);
 
@@ -99,14 +106,14 @@ export default function Dashboard() {
           {screens.map((screen) => (
             <Card key={screen.id} className="overflow-hidden">
               <div className="h-36 bg-gray-200 flex items-center justify-center relative">
-                {screen.imageUrl ? (
-                  <img 
-                    src={screen.imageUrl} 
-                    alt={`Vista previa de ${screen.name}`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
+                {screen.name === "Pantalla Sala Esperanza" ? (
                   <Monitor className="h-12 w-12 text-gray-400" />
+                ) : (
+                  <div className="w-full h-full scale-[0.15] origin-top-left transform">
+                    <div style={{ width: '667px', height: '240px' }}>
+                      <PreviewDisplay deceasedInfo={sampleDeceasedInfo} />
+                    </div>
+                  </div>
                 )}
               </div>
               <CardContent className="p-4">
