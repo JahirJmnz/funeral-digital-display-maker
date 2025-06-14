@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit, Trash2, Plus, Monitor } from "lucide-react";
@@ -6,16 +5,80 @@ import Header from '@/components/Header';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import PreviewDisplay from '@/components/PreviewDisplay';
 import { DeceasedInfo } from '@/types/deceased';
+import { CalendarDays, MapPin } from "lucide-react";
 
 interface Screen {
   id: string;
   name: string;
   location: string;
   hasContent: boolean;
-  imageUrl?: string;
 }
+
+// Mini preview component for the dashboard cards
+const MiniPreviewDisplay = ({ deceasedInfo }: { deceasedInfo: DeceasedInfo }) => {
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    return date.toLocaleDateString('es-ES', options);
+  };
+
+  return (
+    <div className="w-full h-full bg-black flex items-center justify-center p-1">
+      <div className="memorial-display w-full h-full p-2 rounded-sm overflow-hidden text-white" style={{ fontSize: '4px', lineHeight: '1.2' }}>
+        {/* Logo placement */}
+        <div className="flex justify-end mb-1">
+          <div className="text-[3px] font-medium tracking-wider opacity-70">FUNERARIA SAN JOSÉ</div>
+        </div>
+        
+        <div className="flex h-full">
+          {/* Right side - Information only, no photo */}
+          <div className="w-full flex flex-col justify-center">
+            <div className="space-y-2">
+              {/* Name */}
+              <div>
+                <h1 className="text-[6px] font-bold text-white mb-1">
+                  {deceasedInfo.name}
+                </h1>
+              </div>
+              
+              {/* Date and Time */}
+              <div className="flex items-center space-x-1">
+                <CalendarDays className="h-[4px] w-[4px] text-white/70" />
+                <div className="text-[4px] text-white/90">
+                  {formatDate(deceasedInfo.date)}
+                  {deceasedInfo.date && deceasedInfo.time ? " - " : ""}
+                  {deceasedInfo.time}
+                </div>
+              </div>
+              
+              {/* Room */}
+              <div className="flex items-center space-x-1">
+                <MapPin className="h-[4px] w-[4px] text-white/70" />
+                <div className="text-[4px] text-white/90">
+                  Sala: {deceasedInfo.room}
+                </div>
+              </div>
+              
+              {/* Message */}
+              <div className="mt-1 border-t border-white/20 pt-1">
+                <p className="text-[4px] text-white/90 italic">
+                  {deceasedInfo.message}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -26,7 +89,7 @@ export default function Dashboard() {
     name: "Juan Pérez Rodríguez",
     date: "2025-05-17",
     time: "18:00",
-    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face",
+    photoUrl: null,
     room: "Sala Esperanza 3",
     message: "Descanse en paz. Su recuerdo permanecerá siempre en nuestros corazones."
   };
@@ -109,11 +172,7 @@ export default function Dashboard() {
                 {screen.name === "Pantalla Sala Esperanza" ? (
                   <Monitor className="h-12 w-12 text-gray-400" />
                 ) : (
-                  <div className="w-full h-full scale-[0.15] origin-top-left transform">
-                    <div style={{ width: '667px', height: '240px' }}>
-                      <PreviewDisplay deceasedInfo={sampleDeceasedInfo} />
-                    </div>
-                  </div>
+                  <MiniPreviewDisplay deceasedInfo={sampleDeceasedInfo} />
                 )}
               </div>
               <CardContent className="p-4">
