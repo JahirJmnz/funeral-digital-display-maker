@@ -1,3 +1,4 @@
+
 import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -25,7 +26,9 @@ const Screen = ({ texture, position, rotation, size = [3, 1.7] }: {
   React.useEffect(() => {
     if (meshRef.current && texture) {
       texture.needsUpdate = true;
-      meshRef.current.material.needsUpdate = true;
+      // Type cast to ensure we have a single material, not an array
+      const material = meshRef.current.material as THREE.MeshBasicMaterial;
+      material.needsUpdate = true;
       console.log("Screen: Forzando actualización de material y textura");
     }
   }, [texture]);
