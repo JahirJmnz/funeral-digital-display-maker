@@ -1,4 +1,4 @@
-import React, { useRef, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -120,9 +120,9 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
   
   return (
     <div className="w-full h-[500px] bg-black">
-      <Canvas shadows>
+      <Canvas shadows={false}>
         <Suspense fallback={<div>Loading 3D scene...</div>}>
-          <PerspectiveCamera makeDefault position={[0, 1.5, 1]} fov={60} />
+          <PerspectiveCamera makeDefault position={[0, 1.5, 2]} fov={60} />
           <CameraController />
           <ambientLight intensity={0.8} />
           <directionalLight position={[0, 3, 2]} intensity={2.2} castShadow />
