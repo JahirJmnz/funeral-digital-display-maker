@@ -46,48 +46,47 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
     canvas.style.height = height + 'px';
     ctx.scale(dpr, dpr);
 
-    // Background gradient
+    // Background gradient matching PreviewDisplay design
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, '#2D1B69');
-    gradient.addColorStop(1, '#1A0F3A');
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(1, '#16213e');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
-    // Company logo
+    // Company logo (top right)
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = '24px Arial, sans-serif';
+    ctx.font = '20px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillText('FUNERARIA SAN JOSÉ', width - 80, 60);
+    ctx.fillText('FUNERARIA SAN JOSÉ', width - 40, 50);
 
     // Main content area
     const leftWidth = width / 2;
-    const rightWidth = width / 2;
+    const rightStartX = leftWidth + 40;
 
     // Photo placeholder (left side)
     ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.fillRect(80, 120, leftWidth - 160, 480);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillRect(40, 100, leftWidth - 80, 500);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(80, 120, leftWidth - 160, 480);
+    ctx.strokeRect(40, 100, leftWidth - 80, 500);
 
     // Photo icon
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = '48px Arial, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.font = '60px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('📷', leftWidth / 2, 380);
 
     // Right side content
-    const rightStartX = leftWidth + 80;
     
     // Name
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 64px Arial, sans-serif';
+    ctx.font = 'bold 48px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(deceasedInfo.name || "Nombre del fallecido", rightStartX, 220);
+    ctx.fillText(deceasedInfo.name || "Nombre del fallecido", rightStartX, 180);
 
     // Date and time
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.font = '36px Arial, sans-serif';
+    ctx.font = '28px system-ui, -apple-system, sans-serif';
     
     // Format date
     const formatDate = (dateString: string) => {
@@ -104,32 +103,33 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
 
     const dateText = formatDate(deceasedInfo.date);
     const timeText = deceasedInfo.time || "";
-    ctx.fillText(`📅 ${dateText}`, rightStartX, 300);
+    
+    ctx.fillText(`📅 ${dateText}`, rightStartX, 240);
     if (timeText) {
-      ctx.fillText(`⏰ ${timeText}`, rightStartX, 350);
+      ctx.fillText(`⏰ ${timeText}`, rightStartX, 280);
     }
 
     // Room
-    ctx.fillText(`📍 Sala: ${deceasedInfo.room || "Por asignar"}`, rightStartX, 420);
+    ctx.fillText(`📍 Sala: ${deceasedInfo.room || "Por asignar"}`, rightStartX, 320);
+
+    // Separator line
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(rightStartX, 360);
+    ctx.lineTo(rightStartX + 500, 360);
+    ctx.stroke();
 
     // Message
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.font = 'italic 28px Arial, sans-serif';
+    ctx.font = 'italic 24px system-ui, -apple-system, sans-serif';
     const message = deceasedInfo.message || "Mensaje de condolencias";
     
     // Word wrap for message
     const maxWidth = 500;
     const words = message.split(' ');
     let line = '';
-    let y = 520;
-    
-    // Separator line
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(rightStartX, 480);
-    ctx.lineTo(rightStartX + 500, 480);
-    ctx.stroke();
+    let y = 400;
 
     for (let n = 0; n < words.length; n++) {
       const testLine = line + words[n] + ' ';
@@ -138,7 +138,7 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
       if (testWidth > maxWidth && n > 0) {
         ctx.fillText(line, rightStartX, y);
         line = words[n] + ' ';
-        y += 40;
+        y += 35;
       } else {
         line = testLine;
       }
@@ -152,7 +152,7 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
       // Create texture from canvas
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
-      texture.flipY = false;
+      texture.flipY = true; // Correct orientation for 3D screens
       texture.wrapS = THREE.ClampToEdgeWrapping;
       texture.wrapT = THREE.ClampToEdgeWrapping;
       texture.minFilter = THREE.LinearFilter;
