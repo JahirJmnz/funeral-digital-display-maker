@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -58,7 +57,7 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="p-6">
-          <RoomPreview3D deceasedInfo={deceasedInfo} previewImage={null} />
+          <RoomPreview3D deceasedInfo={deceasedInfo} />
           <div className="flex justify-end mt-4">
             <Button onClick={() => onOpenChange(false)}>
               Cerrar

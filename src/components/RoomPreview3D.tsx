@@ -1,5 +1,4 @@
-
-import React, { Suspense } from 'react';
+import React, { Suspense, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,7 +6,6 @@ import { HiddenCanvas } from './CanvasTexture';
 import { DeceasedInfo } from '@/types/deceased';
 
 interface RoomPreview3DProps {
-  previewImage: string | null;
   deceasedInfo?: DeceasedInfo;
 }
 
@@ -48,81 +46,118 @@ const TV = ({ texture, position, rotation = [0, 0, 0] }: {
 
 // Floral Arrangement
 const FloralArrangement = ({ position }: { position: [number, number, number] }) => {
-  const vaseHeight = 0.3;
+  const vaseHeight = 0.35;
+  const vaseRef = useRef<THREE.Mesh>(null!);
+
+  // Helper function to create randomized flower clusters
+  const createFlower = (basePos: [number, number, number], type: 'rose' | 'lily') => {
+    const petals = [];
+    const count = type === 'rose' ? 10 : 6; // Roses have more petals, lilies fewer
+    const radius = type === 'rose' ? 0.05 : 0.07;
+
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const offset = new THREE.Vector3(
+        Math.cos(angle) * radius * (0.8 + Math.random() * 0.2),
+        Math.random() * 0.02,
+        Math.sin(angle) * radius * (0.8 + Math.random() * 0.2)
+      );
+
+      // Use cone geometry for petals to mimic slight curvature
+      petals.push(
+        <mesh
+          key={i}
+          position={offset}
+          rotation={[Math.random() * 0.4, Math.random() * Math.PI * 2, Math.random() * 0.4]}
+        >
+          <coneGeometry args={[type === 'rose' ? 0.015 : 0.025, 0.04, 8]} />
+          <meshStandardMaterial
+            color={type === 'rose' ? '#f8f1f1' : '#fefefe'}
+            roughness={0.6}
+            metalness={0.05}
+            transparent
+            opacity={0.92}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      );
+    }
+
+    return (
+      <group position={basePos}>
+        {/* Stem */}
+        <mesh position={[0, -0.12, 0]}>
+          <cylinderGeometry args={[0.004, 0.004, 0.24, 8]} />
+          <meshStandardMaterial color="#3c6b43" roughness={0.9} />
+        </mesh>
+        {petals}
+      </group>
+    );
+  };
+
+  // Helper function to create varied foliage
+  const createFoliage = (basePos: [number, number, number]) => {
+    return (
+      <group position={basePos}>
+        <mesh rotation={[Math.random() * 0.6, Math.random() * Math.PI * 2, Math.random() * 0.6]}>
+          <planeGeometry args={[0.08, 0.04]} />
+          <meshStandardMaterial
+            color="#2a5f3e"
+            roughness={0.75}
+            metalness={0.1}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
+    );
+  };
+
   return (
     <group position={position}>
-      {/* Vase */}
-      <mesh position={[0, vaseHeight / 2, 0]}>
-        <cylinderGeometry args={[0.15, 0.2, vaseHeight, 16]} />
-        <meshStandardMaterial color="#D1D5DB" /> {/* A light gray ceramic color */}
+      {/* Vase - Elegant, slightly tapered ceramic */}
+      <mesh ref={vaseRef} position={[0, vaseHeight / 2, 0]}>
+        <cylinderGeometry args={[0.12, 0.18, vaseHeight, 24, 1, false, 0, Math.PI * 2]} />
+        <meshStandardMaterial
+          color="#d4d8de"
+          roughness={0.3}
+          metalness={0.25}
+        />
       </mesh>
 
-      {/* Greenery base */}
-      <mesh position={[0, vaseHeight, 0]}>
-        <sphereGeometry args={[0.2, 16, 16]} />
-        <meshStandardMaterial color="#2d6a4f" roughness={0.8} /> {/* Dark green for foliage */}
-      </mesh>
+      {/* Greenery Base - Lush and varied */}
+      <group position={[0, vaseHeight, 0]}>
+        {Array.from({ length: 15 }).map((_, i) => (
+          <group
+            key={i}
+            position={[
+              (Math.random() - 0.5) * 0.25,
+              Math.random() * 0.06,
+              (Math.random() - 0.5) * 0.25
+            ]}
+          >
+            {createFoliage([0, 0, 0])}
+          </group>
+        ))}
+      </group>
 
-      {/* White Flower Clusters */}
-      {/* Cluster 1 */}
-      <group position={[0, vaseHeight + 0.1, 0]}>
-        <mesh>
-          <sphereGeometry args={[0.07, 8, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.5} />
-        </mesh>
-        <mesh position={[0.03, 0.01, 0.03]}>
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
-        </mesh>
-      </group>
-      {/* Cluster 2 */}
-      <group position={[0.1, vaseHeight + 0.07, 0.05]}>
-        <mesh>
-          <sphereGeometry args={[0.07, 8, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.5} />
-        </mesh>
-        <mesh position={[-0.03, -0.01, -0.02]}>
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
-        </mesh>
-      </group>
-      {/* Cluster 3 */}
-      <group position={[-0.08, vaseHeight + 0.08, -0.05]}>
-        <mesh>
-          <sphereGeometry args={[0.07, 8, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.5} />
-        </mesh>
-        <mesh position={[0.03, 0.01, -0.03]}>
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
-        </mesh>
-      </group>
-      {/* Cluster 4 */}
-      <group position={[0.05, vaseHeight + 0.05, -0.1]}>
-        <mesh>
-          <sphereGeometry args={[0.06, 8, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.5} />
-        </mesh>
-        <mesh position={[-0.02, 0.01, 0.03]}>
-          <sphereGeometry args={[0.04, 8, 8]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
-        </mesh>
-      </group>
-      {/* Cluster 5 */}
-      <group position={[-0.05, vaseHeight + 0.05, 0.1]}>
-        <mesh>
-          <sphereGeometry args={[0.06, 8, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.5} />
-        </mesh>
-        <mesh position={[0.02, -0.01, -0.03]}>
-          <sphereGeometry args={[0.04, 8, 8]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
-        </mesh>
-      </group>
+      {/* White Flower Clusters - Mix of roses and lilies */}
+      {[
+        [0, vaseHeight + 0.16, 0, 'rose'],
+        [0.11, vaseHeight + 0.13, 0.06, 'lily'],
+        [-0.09, vaseHeight + 0.15, -0.06, 'rose'],
+        [0.06, vaseHeight + 0.11, -0.11, 'lily'],
+        [-0.06, vaseHeight + 0.12, 0.11, 'rose'],
+        [0.09, vaseHeight + 0.14, 0.09, 'lily'],
+        [-0.11, vaseHeight + 0.12, -0.09, 'rose'],
+        [0.05, vaseHeight + 0.17, 0.05, 'rose'],
+      ].map(([x, y, z, type], i) => (
+        <group key={i}>
+          {createFlower([x as number, y as number, z as number], type as 'rose' | 'lily')}
+        </group>
+      ))}
     </group>
   );
 };
-
 
 // Modern, aesthetic lobby with 3 walls and central seating
 const LobbyRoom = () => {
