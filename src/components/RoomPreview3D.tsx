@@ -1,7 +1,6 @@
-
-import React, { useRef } from 'react';
+import React, { useRef, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface RoomPreview3DProps {
@@ -10,22 +9,16 @@ interface RoomPreview3DProps {
 
 // The screen component that displays the signage content
 const Screen = ({ imageUrl }: { imageUrl: string | null }) => {
-  const texture = React.useMemo(() => {
-    if (!imageUrl) return null;
-    const newTexture = new THREE.TextureLoader().load(imageUrl);
-    newTexture.needsUpdate = true;
-    return newTexture;
-  }, [imageUrl]);
-
-  const defaultTexture = React.useMemo(() => new THREE.TextureLoader().load('/placeholder.svg'), []);
+  // Use the useTexture hook from drei. It handles loading and suspense.
+  const texture = useTexture(imageUrl || '/placeholder.svg');
 
   return (
     <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
       <planeGeometry args={[3, 1.7]} />
       <meshStandardMaterial 
-        map={texture || defaultTexture}
-        emissive={texture ? "#ffffff" : "#000000"}
-        emissiveIntensity={texture ? 0.2 : 0}
+        map={texture}
+        emissive={imageUrl ? "#ffffff" : "#000000"}
+        emissiveIntensity={imageUrl ? 0.2 : 0}
       />
     </mesh>
   );
@@ -87,20 +80,22 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
   return (
     <div className="w-full h-[500px] bg-black">
       <Canvas shadows>
-        <PerspectiveCamera makeDefault position={[0, 1.5, 1]} fov={60} />
-        <CameraController />
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[0, 3, 2]} intensity={1} castShadow />
-        <Room />
-        <Screen imageUrl={previewImage} />
-        <OrbitControls 
-          enableZoom={true} 
-          enablePan={false}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI / 2}
-          minDistance={1}
-          maxDistance={5}
-        />
+        <Suspense fallback={null}>
+          <PerspectiveCamera makeDefault position={[0, 1.5, 1]} fov={60} />
+          <CameraController />
+          <ambientLight intensity={0.3} />
+          <directionalLight position={[0, 3, 2]} intensity={1} castShadow />
+          <Room />
+          <Screen imageUrl={previewImage} />
+          <OrbitControls 
+            enableZoom={true} 
+            enablePan={false}
+            minPolarAngle={Math.PI / 4}
+            maxPolarAngle={Math.PI / 2}
+            minDistance={1}
+            maxDistance={5}
+          />
+        </Suspense>
       </Canvas>
     </div>
   );
