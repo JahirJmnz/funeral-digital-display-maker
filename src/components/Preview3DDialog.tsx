@@ -10,11 +10,13 @@ import {
 import { Button } from "@/components/ui/button";
 import RoomPreview3D from './RoomPreview3D';
 import html2canvas from 'html2canvas';
+import PreviewDisplay from './PreviewDisplay';
+import { DeceasedInfo } from '@/types/deceased';
 
 interface Preview3DDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  deceasedInfo: any;
+  deceasedInfo: DeceasedInfo;
 }
 
 const Preview3DDialog: React.FC<Preview3DDialogProps> = ({ 
@@ -24,53 +26,48 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
 }) => {
   const [previewImage, setPreviewImage] = React.useState<string | null>(null);
   const [isCapturing, setIsCapturing] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
+  const previewRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (open && !isCapturing) {
-      setIsCapturing(true);
-      console.log("=== Comenzando la captura de imagen desde la vista previa... ===");
-      
-      setTimeout(() => {
-        const previewElement = document.querySelector('.memorial-display') as HTMLElement;
-        if (previewElement) {
-          // DEBUG: Check if visible
-          const style = window.getComputedStyle(previewElement);
-          const rect = previewElement.getBoundingClientRect();
-          console.log("Elemento .memorial-display que será capturado:", previewElement);
-          console.log("Tamaño:", previewElement.offsetWidth, previewElement.offsetHeight);
-          console.log("Bounding rect:", rect);
-          console.log("Style.display:", style.display, "Opacity:", style.opacity, "Visibility:", style.visibility);
-          console.log("HTML del elemento a capturar:", previewElement.innerHTML);
-
-          // Si no es visible o no tiene tamaño, advertir
-          if(style.display === "none" || Number(style.opacity) === 0 || style.visibility === "hidden" || previewElement.offsetWidth === 0 || previewElement.offsetHeight === 0){
-            console.warn("ADVERTENCIA: El elemento .memorial-display NO ES VISIBLE y la captura será negra.");
-          }
-
-          html2canvas(previewElement, {
-            backgroundColor: '#2D1B69',
-            logging: true,
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            width: previewElement.offsetWidth,
-            height: previewElement.offsetHeight,
-          }).then(canvas => {
-            const imageData = canvas.toDataURL('image/png');
-            console.log("Imagen capturada exitosamente. DataURL length:", imageData.length, "Ejemplo:", imageData.substring(0,80));
-            setPreviewImage(imageData);
-            setIsCapturing(false);
-          }).catch(error => {
-            console.error("Error capturando la vista previa:", error);
-            setIsCapturing(false);
-          });
-        } else {
-          console.error("No se encontró el elemento .memorial-display");
-          setIsCapturing(false);
-        }
-      }, 1400); // Tiempo aumentado a 1.4s para mayor seguridad de que el DOM cargó completo
+    // Reset state when dialog is closed to ensure fresh capture next time
+    if (!open) {
+      setPreviewImage(null);
+      setImageLoaded(false);
+      setIsCapturing(false);
     }
-  }, [open, isCapturing]);
+  }, [open]);
+
+  React.useEffect(() => {
+    if (open && imageLoaded && !isCapturing) {
+      setIsCapturing(true);
+      console.log("=== Imagen cargada, comenzando captura desde el DOM oculto... ===");
+      
+      const previewElement = previewRef.current?.querySelector('.memorial-display') as HTMLElement;
+      if (previewElement) {
+        html2canvas(previewElement, {
+          backgroundColor: '#2D1B69',
+          logging: true,
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          width: previewElement.offsetWidth,
+          height: previewElement.offsetHeight,
+        }).then(canvas => {
+          const imageData = canvas.toDataURL('image/png');
+          console.log("Imagen capturada exitosamente. DataURL length:", imageData.length);
+          setPreviewImage(imageData);
+          setIsCapturing(false);
+        }).catch(error => {
+          console.error("Error capturando la vista previa:", error);
+          setIsCapturing(false);
+        });
+      } else {
+        console.error("No se encontró el elemento .memorial-display en el ref oculto.");
+        setIsCapturing(false);
+      }
+    }
+  }, [open, imageLoaded, isCapturing]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,10 +78,26 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
             Así se verá la señalización digital en la pantalla de la funeraria.
             {isCapturing && " Capturando imagen del diseño actual..."}
             {previewImage && " Imagen capturada y lista para mostrar."}
-            {!isCapturing && !previewImage && " Error: No se pudo capturar la imagen."}
+            {!isCapturing && !previewImage && " Esperando a que el contenido esté listo..."}
           </DialogDescription>
         </DialogHeader>
         <div className="p-6">
+          {/* Renderizar PreviewDisplay de forma oculta para que html2canvas pueda accederlo */}
+          <div 
+            ref={previewRef} 
+            style={{ 
+              position: 'absolute', 
+              left: '-9999px', 
+              top: '-9999px',
+              width: '1280px', 
+              height: '720px' 
+            }}
+          >
+            <PreviewDisplay 
+              deceasedInfo={deceasedInfo} 
+              onImageLoad={() => setImageLoaded(true)} 
+            />
+          </div>
           <RoomPreview3D previewImage={previewImage} />
           <div className="flex justify-end mt-4">
             <Button onClick={() => onOpenChange(false)}>
@@ -98,4 +111,3 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
 };
 
 export default Preview3DDialog;
-

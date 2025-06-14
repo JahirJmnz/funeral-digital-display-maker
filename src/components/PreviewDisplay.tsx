@@ -1,14 +1,23 @@
 
+import React from 'react';
 import { CalendarDays, MapPin } from "lucide-react";
 import { DeceasedInfo } from "@/types/deceased";
 
 interface PreviewDisplayProps {
   deceasedInfo: DeceasedInfo;
+  onImageLoad?: () => void;
 }
 
-export default function PreviewDisplay({ deceasedInfo }: PreviewDisplayProps) {
+export default function PreviewDisplay({ deceasedInfo, onImageLoad }: PreviewDisplayProps) {
   // Default image placeholder
   const placeholderImage = "/placeholder.svg";
+
+  React.useEffect(() => {
+    // Si no hay foto, consideramos la "imagen" cargada inmediatamente.
+    if (!deceasedInfo.photoUrl && onImageLoad) {
+      onImageLoad();
+    }
+  }, [deceasedInfo.photoUrl, onImageLoad]);
   
   // Format the date and time
   const formatDate = (dateString: string) => {
@@ -46,6 +55,8 @@ export default function PreviewDisplay({ deceasedInfo }: PreviewDisplayProps) {
                   src={deceasedInfo.photoUrl || placeholderImage} 
                   alt="Fotografía del fallecido" 
                   className="absolute inset-0 w-full h-full object-cover"
+                  onLoad={() => onImageLoad && onImageLoad()}
+                  onError={() => onImageLoad && onImageLoad()}
                 />
               </div>
             </div>
