@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -11,22 +10,22 @@ interface RoomPreview3DProps {
   deceasedInfo?: DeceasedInfo;
 }
 
-// TV component with a black frame
+// TV component with a black frame - now smaller and more realistic
 const TV = ({ texture, position }: { 
   texture: THREE.CanvasTexture | null; 
   position: [number, number, number];
 }) => {
   return (
     <group position={position}>
-      {/* TV Frame (black bezel) */}
+      {/* TV Frame (black bezel) - reduced size */}
       <mesh position={[0, 0, 0.01]}>
-        <planeGeometry args={[3.4, 2.1]} />
+        <planeGeometry args={[2.2, 1.3]} />
         <meshStandardMaterial color="#0a0a0a" />
       </mesh>
       
-      {/* TV Screen */}
+      {/* TV Screen - reduced size */}
       <mesh position={[0, 0, 0.02]}>
-        <planeGeometry args={[3, 1.7]} />
+        <planeGeometry args={[2, 1.1]} />
         <meshBasicMaterial 
           map={texture || undefined}
           color={texture ? 'white' : '#333333'}
@@ -36,9 +35,9 @@ const TV = ({ texture, position }: {
         />
       </mesh>
       
-      {/* TV Stand */}
-      <mesh position={[0, -1.2, 0]}>
-        <boxGeometry args={[1, 0.2, 0.3]} />
+      {/* TV Stand - adjusted for smaller TV */}
+      <mesh position={[0, -0.8, 0]}>
+        <boxGeometry args={[0.8, 0.15, 0.25]} />
         <meshStandardMaterial color="#1a1a1a" />
       </mesh>
     </group>
@@ -133,7 +132,7 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
           <directionalLight position={[0, 3, 2]} intensity={1.5} castShadow />
           <Room />
           
-          {/* Solo la TV principal en la pared trasera con marco negro */}
+          {/* TV más pequeña y realista en proporción a la pared */}
           <TV texture={texture} position={[0, 1.5, -1.93]} />
           
           <OrbitControls 
