@@ -47,6 +47,35 @@ const Screen = ({ texture, position, rotation, size = [3, 1.7] }: {
   );
 };
 
+// TV component with a black frame
+const TV = ({ texture, position }: { 
+  texture: THREE.CanvasTexture | null; 
+  position: [number, number, number];
+}) => {
+  return (
+    <group position={position}>
+      {/* TV Frame (black bezel) */}
+      <mesh position={[0, 0, 0.01]}>
+        <planeGeometry args={[3.4, 2.1]} />
+        <meshStandardMaterial color="#0a0a0a" />
+      </mesh>
+      
+      {/* TV Screen */}
+      <Screen 
+        texture={texture} 
+        position={[0, 0, 0.02]} 
+        size={[3, 1.7]} 
+      />
+      
+      {/* TV Stand */}
+      <mesh position={[0, -1.2, 0]}>
+        <boxGeometry args={[1, 0.2, 0.3]} />
+        <meshStandardMaterial color="#1a1a1a" />
+      </mesh>
+    </group>
+  );
+};
+
 // Room component with walls, floor and ceiling
 const Room = () => {
   return (
@@ -79,12 +108,6 @@ const Room = () => {
       <mesh position={[0, 3, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <boxGeometry args={[4, 4, 0.1]} />
         <meshStandardMaterial color="#403E43" />
-      </mesh>
-      
-      {/* Frame for the main TV screen */}
-      <mesh position={[0, 1.5, -1.94]} rotation={[0, 0, 0]}>
-        <boxGeometry args={[3.1, 1.8, 0.05]} />
-        <meshStandardMaterial color="#1A1F2C" />
       </mesh>
     </group>
   );
@@ -141,8 +164,8 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
           <directionalLight position={[0, 3, 2]} intensity={1.5} castShadow />
           <Room />
           
-          {/* Pantalla principal en la pared trasera (TV) - misma textura que las otras */}
-          <Screen texture={texture} position={[0, 1.5, -1.93]} size={[3, 1.7]} />
+          {/* TV principal en la pared trasera con marco negro */}
+          <TV texture={texture} position={[0, 1.5, -1.93]} />
           
           {/* Pantalla en la pared izquierda */}
           <Screen texture={texture} position={[-1.95, 1.5, 0]} rotation={[0, Math.PI / 2, 0]} size={[2, 1.2]} />
