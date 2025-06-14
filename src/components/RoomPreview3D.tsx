@@ -1,5 +1,3 @@
-
-
 import React, { useRef, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -11,52 +9,53 @@ interface RoomPreview3DProps {
 
 // The screen component that displays the signage content
 const Screen = ({ imageUrl }: { imageUrl: string | null }) => {
-  console.log("Screen component received imageUrl:", imageUrl ? `Image provided (${imageUrl.substring(0, 50)}...)` : "No image");
+  // Logs relevantes
+  console.log("Screen: se recibió imageUrl PREVIEW:", imageUrl ? imageUrl.substring(0,80) : "NULO");
   
   const [texture, setTexture] = React.useState<THREE.Texture | null>(null);
-  const [textureLoaded, setTextureLoaded] = React.useState(false);
-  
+
   React.useEffect(() => {
+    let loader = new THREE.TextureLoader();
     if (imageUrl) {
-      console.log("Loading texture from captured image...");
-      const loader = new THREE.TextureLoader();
-      
+      console.log("Screen: cargando textura desde el dataURL...");
+      setTexture(null); // Clean up previa
       loader.load(
         imageUrl,
         (loadedTexture) => {
-          console.log("Texture loaded successfully!");
+          console.log("Screen: textura cargada con éxito:", loadedTexture);
           loadedTexture.flipY = false;
           loadedTexture.wrapS = THREE.ClampToEdgeWrapping;
           loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
           setTexture(loadedTexture);
-          setTextureLoaded(true);
         },
-        (progress) => {
-          console.log("Loading progress:", progress);
-        },
+        undefined,
         (error) => {
-          console.error("Error loading texture:", error);
-          setTextureLoaded(false);
+          console.error("Screen: Error cargando textura para la pantalla 3d:", error, imageUrl.substring(0,200));
         }
       );
     } else {
-      console.log("No imageUrl provided, using placeholder");
-      const loader = new THREE.TextureLoader();
+      // Placeholder si no hay imagen capturada
       loader.load('/placeholder.svg', (loadedTexture) => {
         loadedTexture.flipY = false;
         setTexture(loadedTexture);
-        setTextureLoaded(true);
       });
     }
+    // No cleanup necesario porque el Garbage Collector de three.js libera memoria si el componente se desmonta
   }, [imageUrl]);
+
+  React.useEffect(() => {
+    if (texture) {
+      console.log("Screen: textura aplicada en el mesh!", texture);
+    }
+  }, [texture]);
 
   return (
     <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
       <planeGeometry args={[3, 1.7]} />
       <meshStandardMaterial 
-        map={texture}
-        emissive={textureLoaded && imageUrl ? "#111111" : "#000000"}
-        emissiveIntensity={textureLoaded && imageUrl ? 0.2 : 0}
+        map={texture ? texture : undefined}
+        emissive={"#222222"}
+        emissiveIntensity={texture ? 0.25 : 0}
         side={THREE.FrontSide}
         transparent={false}
       />
@@ -117,7 +116,7 @@ const CameraController = () => {
 };
 
 const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
-  console.log("RoomPreview3D received previewImage:", previewImage ? `Image provided (length: ${previewImage.length})` : "No image");
+  console.log("RoomPreview3D: previewImage recibido", previewImage ? previewImage.substring(0,80) : "NULO");
   
   return (
     <div className="w-full h-[500px] bg-black">
@@ -125,8 +124,8 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
         <Suspense fallback={<div>Loading 3D scene...</div>}>
           <PerspectiveCamera makeDefault position={[0, 1.5, 1]} fov={60} />
           <CameraController />
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[0, 3, 2]} intensity={1.5} castShadow />
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[0, 3, 2]} intensity={2.2} castShadow />
           <Room />
           <Screen imageUrl={previewImage} />
           <OrbitControls 
@@ -144,4 +143,3 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
 };
 
 export default RoomPreview3D;
-

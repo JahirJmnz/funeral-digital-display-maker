@@ -28,15 +28,25 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
   React.useEffect(() => {
     if (open && !isCapturing) {
       setIsCapturing(true);
-      console.log("Starting image capture from preview display...");
+      console.log("=== Comenzando la captura de imagen desde la vista previa... ===");
       
-      // Find the preview display element (the one with memorial-display class)
       setTimeout(() => {
         const previewElement = document.querySelector('.memorial-display') as HTMLElement;
-        
         if (previewElement) {
-          console.log("Found preview element, capturing...", previewElement);
-          
+          // DEBUG: Check if visible
+          const style = window.getComputedStyle(previewElement);
+          const rect = previewElement.getBoundingClientRect();
+          console.log("Elemento .memorial-display que será capturado:", previewElement);
+          console.log("Tamaño:", previewElement.offsetWidth, previewElement.offsetHeight);
+          console.log("Bounding rect:", rect);
+          console.log("Style.display:", style.display, "Opacity:", style.opacity, "Visibility:", style.visibility);
+          console.log("HTML del elemento a capturar:", previewElement.innerHTML);
+
+          // Si no es visible o no tiene tamaño, advertir
+          if(style.display === "none" || Number(style.opacity) === 0 || style.visibility === "hidden" || previewElement.offsetWidth === 0 || previewElement.offsetHeight === 0){
+            console.warn("ADVERTENCIA: El elemento .memorial-display NO ES VISIBLE y la captura será negra.");
+          }
+
           html2canvas(previewElement, {
             backgroundColor: '#2D1B69',
             logging: true,
@@ -47,18 +57,18 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
             height: previewElement.offsetHeight,
           }).then(canvas => {
             const imageData = canvas.toDataURL('image/png');
-            console.log("Image captured successfully, data URL length:", imageData.length);
+            console.log("Imagen capturada exitosamente. DataURL length:", imageData.length, "Ejemplo:", imageData.substring(0,80));
             setPreviewImage(imageData);
             setIsCapturing(false);
           }).catch(error => {
-            console.error("Error capturing preview:", error);
+            console.error("Error capturando la vista previa:", error);
             setIsCapturing(false);
           });
         } else {
-          console.error("Could not find preview element with class 'memorial-display'");
+          console.error("No se encontró el elemento .memorial-display");
           setIsCapturing(false);
         }
-      }, 1000); // Longer delay to ensure the preview is fully rendered
+      }, 1400); // Tiempo aumentado a 1.4s para mayor seguridad de que el DOM cargó completo
     }
   }, [open, isCapturing]);
 
@@ -88,3 +98,4 @@ const Preview3DDialog: React.FC<Preview3DDialogProps> = ({
 };
 
 export default Preview3DDialog;
+
