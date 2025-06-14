@@ -2,64 +2,42 @@ import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
+import { CanvasTexture } from './CanvasTexture';
+import { DeceasedInfo } from '@/types/deceased';
 
 interface RoomPreview3DProps {
   previewImage: string | null;
+  deceasedInfo?: DeceasedInfo;
 }
 
 // The screen component that displays the signage content
-const Screen = ({ imageUrl }: { imageUrl: string | null }) => {
-  // Logs relevantes
-  console.log("Screen: se recibió imageUrl PREVIEW:", imageUrl ? imageUrl.substring(0,80) : "NULO");
-  
-  const [texture, setTexture] = React.useState<THREE.Texture | null>(null);
+const Screen = ({ deceasedInfo }: { deceasedInfo?: DeceasedInfo }) => {
+  const [texture, setTexture] = React.useState<THREE.CanvasTexture | null>(null);
 
-  React.useEffect(() => {
-    let loader = new THREE.TextureLoader();
-    if (imageUrl) {
-      console.log("Screen: cargando textura desde el dataURL...");
-      setTexture(null); // Clean up previa
-      loader.load(
-        imageUrl,
-        (loadedTexture) => {
-          console.log("Screen: textura cargada con éxito:", loadedTexture);
-          loadedTexture.flipY = false;
-          loadedTexture.wrapS = THREE.ClampToEdgeWrapping;
-          loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
-          setTexture(loadedTexture);
-        },
-        undefined,
-        (error) => {
-          console.error("Screen: Error cargando textura para la pantalla 3d:", error, imageUrl.substring(0,200));
-        }
-      );
-    } else {
-      // Placeholder si no hay imagen capturada
-      loader.load('/placeholder.svg', (loadedTexture) => {
-        loadedTexture.flipY = false;
-        setTexture(loadedTexture);
-      });
-    }
-    // No cleanup necesario porque el Garbage Collector de three.js libera memoria si el componente se desmonta
-  }, [imageUrl]);
-
-  React.useEffect(() => {
-    if (texture) {
-      console.log("Screen: textura aplicada en el mesh!", texture);
-    }
-  }, [texture]);
+  const handleTextureReady = React.useCallback((newTexture: THREE.CanvasTexture) => {
+    console.log("Screen: Nueva textura recibida del canvas");
+    setTexture(newTexture);
+  }, []);
 
   return (
-    <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
-      <planeGeometry args={[3, 1.7]} />
-      <meshStandardMaterial 
-        map={texture ? texture : undefined}
-        emissive={"#222222"}
-        emissiveIntensity={texture ? 0.25 : 0}
-        side={THREE.FrontSide}
-        transparent={false}
-      />
-    </mesh>
+    <>
+      {deceasedInfo && (
+        <CanvasTexture 
+          deceasedInfo={deceasedInfo} 
+          onTextureReady={handleTextureReady}
+        />
+      )}
+      <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
+        <planeGeometry args={[3, 1.7]} />
+        <meshStandardMaterial 
+          map={texture || undefined}
+          emissive={"#222222"}
+          emissiveIntensity={texture ? 0.25 : 0}
+          side={THREE.FrontSide}
+          transparent={false}
+        />
+      </mesh>
+    </>
   );
 };
 
@@ -115,8 +93,8 @@ const CameraController = () => {
   return null;
 };
 
-const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
-  console.log("RoomPreview3D: previewImage recibido", previewImage ? previewImage.substring(0,80) : "NULO");
+const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
+  console.log("RoomPreview3D: deceasedInfo recibido", deceasedInfo?.name);
   
   return (
     <div className="w-full h-[500px] bg-black">
@@ -127,7 +105,7 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ previewImage }) => {
           <ambientLight intensity={0.8} />
           <directionalLight position={[0, 3, 2]} intensity={2.2} castShadow />
           <Room />
-          <Screen imageUrl={previewImage} />
+          <Screen deceasedInfo={deceasedInfo} />
           <OrbitControls 
             enableZoom={true} 
             enablePan={false}
