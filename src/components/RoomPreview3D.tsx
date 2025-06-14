@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -46,6 +45,45 @@ const TV = ({ texture, position, rotation = [0, 0, 0] }: {
   );
 };
 
+// Floral Arrangement
+const FloralArrangement = ({ position }: { position: [number, number, number] }) => {
+  const vaseHeight = 0.3;
+  return (
+    <group position={position}>
+      {/* Vase */}
+      <mesh position={[0, vaseHeight / 2, 0]}>
+        <cylinderGeometry args={[0.15, 0.2, vaseHeight, 16]} />
+        <meshStandardMaterial color="#D1D5DB" /> {/* A light gray ceramic color */}
+      </mesh>
+
+      {/* Greenery base */}
+      <mesh position={[0, vaseHeight, 0]}>
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshStandardMaterial color="#2d6a4f" roughness={0.8} /> {/* Dark green for foliage */}
+      </mesh>
+
+      {/* Flowers - soft colors */}
+      <mesh position={[0, vaseHeight + 0.1, 0]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
+        <meshStandardMaterial color="#fff1e6" /> {/* Off-white */}
+      </mesh>
+      <mesh position={[0.1, vaseHeight + 0.05, 0.05]}>
+        <sphereGeometry args={[0.08, 16, 16]} />
+        <meshStandardMaterial color="#fde2e4" /> {/* Soft pink */}
+      </mesh>
+      <mesh position={[-0.08, vaseHeight + 0.03, -0.05]}>
+        <sphereGeometry args={[0.09, 16, 16]} />
+        <meshStandardMaterial color="#fff1e6" /> {/* Off-white */}
+      </mesh>
+      <mesh position={[0.05, vaseHeight + 0.05, -0.1]}>
+        <sphereGeometry args={[0.07, 16, 16]} />
+        <meshStandardMaterial color="#fde2e4" /> {/* Soft pink */}
+      </mesh>
+    </group>
+  );
+};
+
+
 // Modern, aesthetic lobby with 3 walls and central seating
 const LobbyRoom = () => {
     // Room dimensions
@@ -91,6 +129,7 @@ const LobbyRoom = () => {
                         <boxGeometry args={[3.5, 0.1, 2]} />
                         <meshStandardMaterial color="#22223b" />
                     </mesh>
+                    <FloralArrangement position={[0, 0.15, 0]} />
                     <mesh position={[-1.5, -0.15, 0.75]}>
                         <boxGeometry args={[0.2, 0.5, 0.2]} />
                         <meshStandardMaterial color="#1a1a1a" />
