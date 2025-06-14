@@ -10,7 +10,7 @@ interface RoomPreview3DProps {
   deceasedInfo?: DeceasedInfo;
 }
 
-// TV component with a black frame - now smaller and more realistic
+// TV component with a black frame - remains unchanged
 const TV = ({ texture, position }: { 
   texture: THREE.CanvasTexture | null; 
   position: [number, number, number];
@@ -44,48 +44,74 @@ const TV = ({ texture, position }: {
   );
 };
 
-// Room component with walls, floor and ceiling
-const Room = () => {
+// Modern lobby/room: much larger with basic lobby elements
+const LobbyRoom = () => {
+  // Room dimensions
+  const width = 10;
+  const depth = 14;
+  const height = 5; // Much higher ceiling
+
   return (
     <group>
-      {/* Back wall */}
-      <mesh position={[0, 1.5, -2]} rotation={[0, 0, 0]}>
-        <boxGeometry args={[4, 3, 0.1]} />
-        <meshStandardMaterial color="#8E9196" />
-      </mesh>
-      
-      {/* Left wall */}
-      <mesh position={[-2, 1.5, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[4, 3, 0.1]} />
-        <meshStandardMaterial color="#8E9196" />
-      </mesh>
-      
-      {/* Right wall */}
-      <mesh position={[2, 1.5, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <boxGeometry args={[4, 3, 0.1]} />
-        <meshStandardMaterial color="#8E9196" />
-      </mesh>
-      
       {/* Floor */}
       <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <boxGeometry args={[4, 4, 0.1]} />
+        <boxGeometry args={[width, depth, 0.1]} />
         <meshStandardMaterial color="#403E43" />
       </mesh>
-      
       {/* Ceiling */}
-      <mesh position={[0, 3, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <boxGeometry args={[4, 4, 0.1]} />
-        <meshStandardMaterial color="#403E43" />
+      <mesh position={[0, height, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <boxGeometry args={[width, depth, 0.1]} />
+        <meshStandardMaterial color="#e7e7ea" />
+      </mesh>
+      {/* Back Wall (TV wall) */}
+      <mesh position={[0, height / 2, -depth / 2]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[width, height, 0.15]} />
+        <meshStandardMaterial color="#8E9196" />
+      </mesh>
+      {/* Front Wall (main entrance, with a wide door) */}
+      <mesh position={[0, height / 2, depth / 2]} rotation={[0, Math.PI, 0]}>
+        <boxGeometry args={[width, height, 0.15]} />
+        <meshStandardMaterial color="#8E9196" />
+      </mesh>
+      {/* Big entrance: We'll cut a "door" by overlaying a white rectangle for visual effect */}
+      <mesh position={[0, 1.25, depth / 2 + 0.08]}>
+        <boxGeometry args={[4, 2.5, 0.02]} />
+        <meshStandardMaterial color="#dbeafe" />
+      </mesh>
+      {/* Left wall */}
+      <mesh position={[-width / 2, height / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[depth, height, 0.15]} />
+        <meshStandardMaterial color="#8E9196" />
+      </mesh>
+      {/* Right wall */}
+      <mesh position={[width / 2, height / 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <boxGeometry args={[depth, height, 0.15]} />
+        <meshStandardMaterial color="#8E9196" />
+      </mesh>
+      {/* Lobby Reception (simple desk) */}
+      <mesh position={[3, 1, 1]}>
+        <boxGeometry args={[2.5, 0.8, 0.6]} />
+        <meshStandardMaterial color="#d4d4d8" />
+      </mesh>
+      {/* Decorative plant block (simple box - left corner) */}
+      <mesh position={[-4.2, 0.7, 5.5]}>
+        <boxGeometry args={[0.5, 1.4, 0.5]} />
+        <meshStandardMaterial color="#467252" />
+      </mesh>
+      {/* Decorative bench (right side wall) */}
+      <mesh position={[4.3, 0.5, -4]}>
+        <boxGeometry args={[2.6, 0.35, 0.5]} />
+        <meshStandardMaterial color="#cb997e" />
       </mesh>
     </group>
   );
 };
 
-// The camera controller
+// The camera controller - now set to a wider view for the lobby
 const CameraController = () => {
   const { camera } = useThree();
   useFrame(() => {
-    camera.lookAt(0, 1.5, -1.95);
+    camera.lookAt(0, 1.5, -5);
   });
   return null;
 };
@@ -116,32 +142,28 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
   
   return (
     <div className="w-full h-[500px] bg-black relative">
-      {/* Hidden canvas rendered outside R3F context */}
       {deceasedInfo && (
         <HiddenCanvas 
           deceasedInfo={deceasedInfo} 
           onTextureReady={handleTextureReady}
         />
       )}
-      
-      <Canvas shadows={false}>
+      <Canvas shadows={true}>
         <Suspense fallback={<div>Loading 3D scene...</div>}>
-          <PerspectiveCamera makeDefault position={[0, 1.5, 2]} fov={60} />
+          <PerspectiveCamera makeDefault position={[0, 2, 8]} fov={65} />
           <CameraController />
           <ambientLight intensity={1.2} />
-          <directionalLight position={[0, 3, 2]} intensity={1.5} castShadow />
-          <Room />
-          
-          {/* TV más pequeña y realista en proporción a la pared */}
-          <TV texture={texture} position={[0, 1.5, -1.93]} />
-          
+          <directionalLight position={[0, 8, 10]} intensity={2} castShadow />
+          <LobbyRoom />
+          {/* TV más pequeña y realista en proporción a la nueva pared */}
+          <TV texture={texture} position={[0, 2, -7.01]} />
           <OrbitControls 
             enableZoom={true} 
-            enablePan={false}
+            enablePan={true}
             minPolarAngle={Math.PI / 4}
             maxPolarAngle={Math.PI / 2}
-            minDistance={1}
-            maxDistance={5}
+            minDistance={4}
+            maxDistance={24}
           />
         </Suspense>
       </Canvas>
