@@ -12,11 +12,21 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   React.useEffect(() => {
+    console.log("CanvasTexture: useEffect ejecutado con deceasedInfo:", deceasedInfo.name);
+    
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.log("CanvasTexture: Canvas ref no disponible");
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log("CanvasTexture: No se pudo obtener el contexto 2D");
+      return;
+    }
+
+    console.log("CanvasTexture: Iniciando generación de canvas");
 
     // Set canvas size
     canvas.width = 1280;
@@ -121,6 +131,8 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
     }
     ctx.fillText(line, rightStartX, y);
 
+    console.log("CanvasTexture: Canvas dibujado, creando textura THREE.js");
+
     // Create texture from canvas
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;
@@ -128,16 +140,33 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
     texture.wrapS = THREE.ClampToEdgeWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
 
-    console.log("CanvasTexture: Textura generada directamente en canvas");
-    onTextureReady(texture);
+    console.log("CanvasTexture: Textura creada, llamando onTextureReady");
+    
+    // Use setTimeout to ensure the callback is called after the component has rendered
+    setTimeout(() => {
+      onTextureReady(texture);
+      console.log("CanvasTexture: onTextureReady ejecutado");
+    }, 100);
 
   }, [deceasedInfo, onTextureReady]);
 
-  return null; // Don't render anything - this component only generates textures
+  return (
+    <canvas 
+      ref={canvasRef} 
+      style={{ 
+        position: 'absolute', 
+        left: '-9999px', 
+        top: '-9999px', 
+        visibility: 'hidden' 
+      }} 
+    />
+  );
 };
 
 // Separate component for the hidden canvas that renders outside R3F context
 export const HiddenCanvas: React.FC<{ deceasedInfo: DeceasedInfo; onTextureReady: (texture: THREE.CanvasTexture) => void }> = ({ deceasedInfo, onTextureReady }) => {
+  console.log("HiddenCanvas: Renderizando con deceasedInfo:", deceasedInfo?.name);
+  
   return (
     <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }}>
       <CanvasTexture deceasedInfo={deceasedInfo} onTextureReady={onTextureReady} />

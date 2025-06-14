@@ -91,8 +91,14 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
 
   const handleTextureReady = React.useCallback((newTexture: THREE.CanvasTexture) => {
     console.log("RoomPreview3D: Nueva textura recibida del canvas");
+    console.log("RoomPreview3D: Textura tiene datos:", !!newTexture);
+    console.log("RoomPreview3D: Textura image:", newTexture.image);
     setTexture(newTexture);
   }, []);
+
+  React.useEffect(() => {
+    console.log("RoomPreview3D: Estado de texture actualizado:", !!texture);
+  }, [texture]);
   
   return (
     <div className="w-full h-[500px] bg-black relative">
