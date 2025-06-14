@@ -81,7 +81,7 @@ const Room = () => {
         <meshStandardMaterial color="#403E43" />
       </mesh>
       
-      {/* Frame for the original screen */}
+      {/* Frame for the main TV screen */}
       <mesh position={[0, 1.5, -1.94]} rotation={[0, 0, 0]}>
         <boxGeometry args={[3.1, 1.8, 0.05]} />
         <meshStandardMaterial color="#1A1F2C" />
@@ -141,8 +141,8 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
           <directionalLight position={[0, 3, 2]} intensity={1.5} castShadow />
           <Room />
           
-          {/* Pantalla original en la pared trasera */}
-          <Screen texture={texture} position={[0, 1.5, -1.95]} />
+          {/* Pantalla principal en la pared trasera (TV) - misma textura que las otras */}
+          <Screen texture={texture} position={[0, 1.5, -1.93]} size={[3, 1.7]} />
           
           {/* Pantalla en la pared izquierda */}
           <Screen texture={texture} position={[-1.95, 1.5, 0]} rotation={[0, Math.PI / 2, 0]} size={[2, 1.2]} />
