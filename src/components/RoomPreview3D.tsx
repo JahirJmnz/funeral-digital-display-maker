@@ -18,13 +18,14 @@ const Screen = ({ texture, position, rotation, size = [3, 1.7] }: {
   rotation?: [number, number, number];
   size?: [number, number];
 }) => {
+  console.log("Screen: Renderizando con textura:", !!texture);
+  
   return (
     <mesh position={position} rotation={rotation || [0, 0, 0]}>
       <planeGeometry args={[size[0], size[1]]} />
-      <meshStandardMaterial 
+      <meshBasicMaterial 
         map={texture || undefined}
-        emissive={"#222222"}
-        emissiveIntensity={texture ? 0.25 : 0}
+        color={texture ? 'white' : '#333333'}
         side={THREE.DoubleSide}
         transparent={false}
       />
@@ -93,11 +94,18 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
     console.log("RoomPreview3D: Nueva textura recibida del canvas");
     console.log("RoomPreview3D: Textura tiene datos:", !!newTexture);
     console.log("RoomPreview3D: Textura image:", newTexture.image);
+    console.log("RoomPreview3D: Textura image width/height:", newTexture.image?.width, newTexture.image?.height);
+    
+    // Force texture update
+    newTexture.needsUpdate = true;
     setTexture(newTexture);
   }, []);
 
   React.useEffect(() => {
     console.log("RoomPreview3D: Estado de texture actualizado:", !!texture);
+    if (texture) {
+      console.log("RoomPreview3D: Texture image data:", texture.image);
+    }
   }, [texture]);
   
   return (
@@ -114,8 +122,8 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
         <Suspense fallback={<div>Loading 3D scene...</div>}>
           <PerspectiveCamera makeDefault position={[0, 1.5, 2]} fov={60} />
           <CameraController />
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[0, 3, 2]} intensity={2.2} castShadow />
+          <ambientLight intensity={1.2} />
+          <directionalLight position={[0, 3, 2]} intensity={1.5} castShadow />
           <Room />
           
           {/* Pantalla original en la pared trasera */}
