@@ -71,34 +71,35 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
       const photoHeight = 500;
 
       if (photoImage) {
-        // Draw the actual photo
+        // Draw the actual photo - using cover behavior to fill entire space
         ctx.save();
         
-        // Calculate scaling to fit the photo in the designated area while maintaining aspect ratio
+        // Calculate scaling to cover the entire photo area (like object-fit: cover)
         const imgAspect = photoImage.width / photoImage.height;
         const areaAspect = photoWidth / photoHeight;
         
         let drawWidth, drawHeight, drawX, drawY;
         
         if (imgAspect > areaAspect) {
-          // Image is wider, fit by width
+          // Image is wider, scale by height to cover full area
+          drawHeight = photoHeight;
+          drawWidth = photoHeight * imgAspect;
+          drawX = photoX - (drawWidth - photoWidth) / 2; // Center horizontally
+          drawY = photoY;
+        } else {
+          // Image is taller, scale by width to cover full area
           drawWidth = photoWidth;
           drawHeight = photoWidth / imgAspect;
           drawX = photoX;
-          drawY = photoY + (photoHeight - drawHeight) / 2;
-        } else {
-          // Image is taller, fit by height
-          drawHeight = photoHeight;
-          drawWidth = photoHeight * imgAspect;
-          drawX = photoX + (photoWidth - drawWidth) / 2;
-          drawY = photoY;
+          drawY = photoY - (drawHeight - photoHeight) / 2; // Center vertically
         }
         
-        // Create rounded corners effect
+        // Create rounded corners effect and clip to photo area
         ctx.beginPath();
         ctx.roundRect(photoX, photoY, photoWidth, photoHeight, 8);
         ctx.clip();
         
+        // Draw image to fill entire clipped area
         ctx.drawImage(photoImage, drawX, drawY, drawWidth, drawHeight);
         ctx.restore();
         
