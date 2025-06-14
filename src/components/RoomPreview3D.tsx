@@ -1,8 +1,9 @@
+
 import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import { CanvasTexture } from './CanvasTexture';
+import { HiddenCanvas } from './CanvasTexture';
 import { DeceasedInfo } from '@/types/deceased';
 
 interface RoomPreview3DProps {
@@ -11,33 +12,18 @@ interface RoomPreview3DProps {
 }
 
 // The screen component that displays the signage content
-const Screen = ({ deceasedInfo }: { deceasedInfo?: DeceasedInfo }) => {
-  const [texture, setTexture] = React.useState<THREE.CanvasTexture | null>(null);
-
-  const handleTextureReady = React.useCallback((newTexture: THREE.CanvasTexture) => {
-    console.log("Screen: Nueva textura recibida del canvas");
-    setTexture(newTexture);
-  }, []);
-
+const Screen = ({ texture }: { texture: THREE.CanvasTexture | null }) => {
   return (
-    <>
-      {deceasedInfo && (
-        <CanvasTexture 
-          deceasedInfo={deceasedInfo} 
-          onTextureReady={handleTextureReady}
-        />
-      )}
-      <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
-        <planeGeometry args={[3, 1.7]} />
-        <meshStandardMaterial 
-          map={texture || undefined}
-          emissive={"#222222"}
-          emissiveIntensity={texture ? 0.25 : 0}
-          side={THREE.FrontSide}
-          transparent={false}
-        />
-      </mesh>
-    </>
+    <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
+      <planeGeometry args={[3, 1.7]} />
+      <meshStandardMaterial 
+        map={texture || undefined}
+        emissive={"#222222"}
+        emissiveIntensity={texture ? 0.25 : 0}
+        side={THREE.FrontSide}
+        transparent={false}
+      />
+    </mesh>
   );
 };
 
@@ -96,8 +82,23 @@ const CameraController = () => {
 const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
   console.log("RoomPreview3D: deceasedInfo recibido", deceasedInfo?.name);
   
+  const [texture, setTexture] = React.useState<THREE.CanvasTexture | null>(null);
+
+  const handleTextureReady = React.useCallback((newTexture: THREE.CanvasTexture) => {
+    console.log("RoomPreview3D: Nueva textura recibida del canvas");
+    setTexture(newTexture);
+  }, []);
+  
   return (
-    <div className="w-full h-[500px] bg-black">
+    <div className="w-full h-[500px] bg-black relative">
+      {/* Hidden canvas rendered outside R3F context */}
+      {deceasedInfo && (
+        <HiddenCanvas 
+          deceasedInfo={deceasedInfo} 
+          onTextureReady={handleTextureReady}
+        />
+      )}
+      
       <Canvas shadows={false}>
         <Suspense fallback={<div>Loading 3D scene...</div>}>
           <PerspectiveCamera makeDefault position={[0, 1.5, 2]} fov={60} />
@@ -105,7 +106,7 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
           <ambientLight intensity={0.8} />
           <directionalLight position={[0, 3, 2]} intensity={2.2} castShadow />
           <Room />
-          <Screen deceasedInfo={deceasedInfo} />
+          <Screen texture={texture} />
           <OrbitControls 
             enableZoom={true} 
             enablePan={false}

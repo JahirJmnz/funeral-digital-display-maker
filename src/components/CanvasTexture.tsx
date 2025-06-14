@@ -133,12 +133,14 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
 
   }, [deceasedInfo, onTextureReady]);
 
+  return null; // Don't render anything - this component only generates textures
+};
+
+// Separate component for the hidden canvas that renders outside R3F context
+export const HiddenCanvas: React.FC<{ deceasedInfo: DeceasedInfo; onTextureReady: (texture: THREE.CanvasTexture) => void }> = ({ deceasedInfo, onTextureReady }) => {
   return (
-    <canvas
-      ref={canvasRef}
-      style={{ display: 'none' }}
-      width={1280}
-      height={720}
-    />
+    <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }}>
+      <CanvasTexture deceasedInfo={deceasedInfo} onTextureReady={onTextureReady} />
+    </div>
   );
 };
