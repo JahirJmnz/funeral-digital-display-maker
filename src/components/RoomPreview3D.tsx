@@ -12,15 +12,20 @@ interface RoomPreview3DProps {
 }
 
 // The screen component that displays the signage content
-const Screen = ({ texture }: { texture: THREE.CanvasTexture | null }) => {
+const Screen = ({ texture, position, rotation, size = [3, 1.7] }: { 
+  texture: THREE.CanvasTexture | null; 
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  size?: [number, number];
+}) => {
   return (
-    <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
-      <planeGeometry args={[3, 1.7]} />
+    <mesh position={position} rotation={rotation || [0, 0, 0]}>
+      <planeGeometry args={[size[0], size[1]]} />
       <meshStandardMaterial 
         map={texture || undefined}
         emissive={"#222222"}
         emissiveIntensity={texture ? 0.25 : 0}
-        side={THREE.FrontSide}
+        side={THREE.DoubleSide}
         transparent={false}
       />
     </mesh>
@@ -61,7 +66,7 @@ const Room = () => {
         <meshStandardMaterial color="#403E43" />
       </mesh>
       
-      {/* Frame for the screen */}
+      {/* Frame for the original screen */}
       <mesh position={[0, 1.5, -1.94]} rotation={[0, 0, 0]}>
         <boxGeometry args={[3.1, 1.8, 0.05]} />
         <meshStandardMaterial color="#1A1F2C" />
@@ -106,7 +111,22 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
           <ambientLight intensity={0.8} />
           <directionalLight position={[0, 3, 2]} intensity={2.2} castShadow />
           <Room />
-          <Screen texture={texture} />
+          
+          {/* Pantalla original en la pared trasera */}
+          <Screen texture={texture} position={[0, 1.5, -1.95]} />
+          
+          {/* Pantalla en la pared izquierda */}
+          <Screen texture={texture} position={[-1.95, 1.5, 0]} rotation={[0, Math.PI / 2, 0]} size={[2, 1.2]} />
+          
+          {/* Pantalla en la pared derecha */}
+          <Screen texture={texture} position={[1.95, 1.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[2, 1.2]} />
+          
+          {/* Pantalla flotante en el centro */}
+          <Screen texture={texture} position={[0, 2.5, 0]} rotation={[-Math.PI / 4, 0, 0]} size={[2.5, 1.4]} />
+          
+          {/* Pantalla en el suelo */}
+          <Screen texture={texture} position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]} size={[2, 1.2]} />
+          
           <OrbitControls 
             enableZoom={true} 
             enablePan={false}
