@@ -10,21 +10,22 @@ interface RoomPreview3DProps {
 
 // The screen component that displays the signage content
 const Screen = ({ imageUrl }: { imageUrl: string | null }) => {
-  const texture = useRef<THREE.Texture | null>(null);
-  
-  if (imageUrl && !texture.current) {
-    texture.current = new THREE.TextureLoader().load(imageUrl);
-  }
+  const texture = React.useMemo(() => {
+    if (!imageUrl) return null;
+    const newTexture = new THREE.TextureLoader().load(imageUrl);
+    newTexture.needsUpdate = true;
+    return newTexture;
+  }, [imageUrl]);
 
-  const defaultTexture = useRef(new THREE.TextureLoader().load('/placeholder.svg'));
+  const defaultTexture = React.useMemo(() => new THREE.TextureLoader().load('/placeholder.svg'), []);
 
   return (
     <mesh position={[0, 1.5, -1.95]} rotation={[0, 0, 0]}>
       <planeGeometry args={[3, 1.7]} />
       <meshStandardMaterial 
-        map={imageUrl && texture.current ? texture.current : defaultTexture.current}
-        emissive="#ffffff"
-        emissiveIntensity={0.2}
+        map={texture || defaultTexture}
+        emissive={texture ? "#ffffff" : "#000000"}
+        emissiveIntensity={texture ? 0.2 : 0}
       />
     </mesh>
   );
