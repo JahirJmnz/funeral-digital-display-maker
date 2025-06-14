@@ -70,7 +70,7 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
       const photoHeight = 500;
 
       if (photoImage) {
-        // Draw the actual photo - stretch to fill entire space completely
+        // Draw the actual photo - using cover behavior to fill entire space without white bars
         ctx.save();
         
         // Create rounded corners effect and clip to photo area
@@ -78,8 +78,29 @@ export const CanvasTexture: React.FC<CanvasTextureProps> = ({ deceasedInfo, onTe
         ctx.roundRect(photoX, photoY, photoWidth, photoHeight, 8);
         ctx.clip();
         
-        // Draw image stretched to fill entire clipped area (ignoring aspect ratio to avoid white bars)
-        ctx.drawImage(photoImage, photoX, photoY, photoWidth, photoHeight);
+        // Calculate scaling to cover the entire photo area (like object-fit: cover)
+        const imgAspect = photoImage.width / photoImage.height;
+        const areaAspect = photoWidth / photoHeight;
+        
+        let sourceX = 0, sourceY = 0, sourceWidth = photoImage.width, sourceHeight = photoImage.height;
+        
+        if (imgAspect > areaAspect) {
+          // Image is wider than area - crop sides
+          sourceWidth = photoImage.height * areaAspect;
+          sourceX = (photoImage.width - sourceWidth) / 2;
+        } else {
+          // Image is taller than area - crop top/bottom
+          sourceHeight = photoImage.width / areaAspect;
+          sourceY = (photoImage.height - sourceHeight) / 2;
+        }
+        
+        // Draw cropped image to fill entire area
+        ctx.drawImage(
+          photoImage,
+          sourceX, sourceY, sourceWidth, sourceHeight,  // Source crop
+          photoX, photoY, photoWidth, photoHeight       // Destination fill
+        );
+        
         ctx.restore();
         
         // Add a subtle border
