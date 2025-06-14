@@ -11,42 +11,6 @@ interface RoomPreview3DProps {
   deceasedInfo?: DeceasedInfo;
 }
 
-// The screen component that displays the signage content
-const Screen = ({ texture, position, rotation, size = [3, 1.7] }: { 
-  texture: THREE.CanvasTexture | null; 
-  position: [number, number, number];
-  rotation?: [number, number, number];
-  size?: [number, number];
-}) => {
-  console.log("Screen: Renderizando con textura:", !!texture);
-  console.log("Screen: Texture image dimensions:", texture?.image?.width, texture?.image?.height);
-  
-  const meshRef = React.useRef<THREE.Mesh>(null);
-  
-  React.useEffect(() => {
-    if (meshRef.current && texture) {
-      texture.needsUpdate = true;
-      // Type cast to ensure we have a single material, not an array
-      const material = meshRef.current.material as THREE.MeshBasicMaterial;
-      material.needsUpdate = true;
-      console.log("Screen: Forzando actualización de material y textura");
-    }
-  }, [texture]);
-  
-  return (
-    <mesh ref={meshRef} position={position} rotation={rotation || [0, 0, 0]}>
-      <planeGeometry args={[size[0], size[1]]} />
-      <meshBasicMaterial 
-        map={texture || undefined}
-        color={texture ? 'white' : '#333333'}
-        side={THREE.DoubleSide}
-        transparent={false}
-        toneMapped={false}
-      />
-    </mesh>
-  );
-};
-
 // TV component with a black frame
 const TV = ({ texture, position }: { 
   texture: THREE.CanvasTexture | null; 
@@ -61,11 +25,16 @@ const TV = ({ texture, position }: {
       </mesh>
       
       {/* TV Screen */}
-      <Screen 
-        texture={texture} 
-        position={[0, 0, 0.02]} 
-        size={[3, 1.7]} 
-      />
+      <mesh position={[0, 0, 0.02]}>
+        <planeGeometry args={[3, 1.7]} />
+        <meshBasicMaterial 
+          map={texture || undefined}
+          color={texture ? 'white' : '#333333'}
+          side={THREE.DoubleSide}
+          transparent={false}
+          toneMapped={false}
+        />
+      </mesh>
       
       {/* TV Stand */}
       <mesh position={[0, -1.2, 0]}>
@@ -164,20 +133,8 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
           <directionalLight position={[0, 3, 2]} intensity={1.5} castShadow />
           <Room />
           
-          {/* TV principal en la pared trasera con marco negro */}
+          {/* Solo la TV principal en la pared trasera con marco negro */}
           <TV texture={texture} position={[0, 1.5, -1.93]} />
-          
-          {/* Pantalla en la pared izquierda */}
-          <Screen texture={texture} position={[-1.95, 1.5, 0]} rotation={[0, Math.PI / 2, 0]} size={[2, 1.2]} />
-          
-          {/* Pantalla en la pared derecha */}
-          <Screen texture={texture} position={[1.95, 1.5, 0]} rotation={[0, -Math.PI / 2, 0]} size={[2, 1.2]} />
-          
-          {/* Pantalla flotante en el centro */}
-          <Screen texture={texture} position={[0, 2.5, 0]} rotation={[-Math.PI / 4, 0, 0]} size={[2.5, 1.4]} />
-          
-          {/* Pantalla en el suelo */}
-          <Screen texture={texture} position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]} size={[2, 1.2]} />
           
           <OrbitControls 
             enableZoom={true} 
