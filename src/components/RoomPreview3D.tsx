@@ -19,15 +19,15 @@ const TV = ({ texture, position, rotation = [0, 0, 0] }: {
 }) => {
   return (
     <group position={position} rotation={rotation}>
-      {/* TV Frame (black bezel) - reduced size */}
+      {/* TV Frame (black bezel) - increased size */}
       <mesh position={[0, 0, 0.01]}>
-        <planeGeometry args={[2.2, 1.3]} />
+        <planeGeometry args={[4.4, 2.6]} />
         <meshStandardMaterial color="#0a0a0a" />
       </mesh>
       
-      {/* TV Screen - reduced size */}
+      {/* TV Screen - increased size */}
       <mesh position={[0, 0, 0.02]}>
-        <planeGeometry args={[2, 1.1]} />
+        <planeGeometry args={[4, 2.2]} />
         <meshBasicMaterial 
           map={texture || undefined}
           color={texture ? 'white' : '#333333'}
@@ -37,9 +37,9 @@ const TV = ({ texture, position, rotation = [0, 0, 0] }: {
         />
       </mesh>
       
-      {/* TV Stand - adjusted for smaller TV */}
-      <mesh position={[0, -0.8, 0]}>
-        <boxGeometry args={[0.8, 0.15, 0.25]} />
+      {/* TV Stand - adjusted for larger TV */}
+      <mesh position={[0, -1.425, 0]}>
+        <boxGeometry args={[1.6, 0.15, 0.25]} />
         <meshStandardMaterial color="#1a1a1a" />
       </mesh>
     </group>
@@ -55,32 +55,32 @@ const LobbyRoom = () => {
 
     return (
         <group>
-            {/* Floor - polished dark concrete look */}
+            {/* Floor - wood look */}
             <mesh position={[0, -0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
                 <planeGeometry args={[width, depth]} />
-                <meshStandardMaterial color="#4a4e69" metalness={0.1} roughness={0.5} />
+                <meshStandardMaterial color="#855E42" metalness={0} roughness={0.7} />
             </mesh>
             
             {/* Ceiling */}
             <mesh position={[0, height, 0]} rotation={[Math.PI / 2, 0, 0]}>
                 <planeGeometry args={[width, depth]} />
-                <meshStandardMaterial color="#f2e9e4" />
+                <meshStandardMaterial color="#f8f8f8" />
             </mesh>
             
             {/* Back Wall (TV wall) */}
             <mesh position={[0, height / 2, -depth / 2]}>
                 <boxGeometry args={[width, height, 0.15]} />
-                <meshStandardMaterial color="#9a8c98" />
+                <meshStandardMaterial color="#f8f8f8" />
             </mesh>
 
             {/* Side Walls */}
             <mesh position={[-width / 2, height / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
                 <boxGeometry args={[depth, height, 0.15]} />
-                <meshStandardMaterial color="#f2e9e4" />
+                <meshStandardMaterial color="#f8f8f8" />
             </mesh>
             <mesh position={[width / 2, height / 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
                 <boxGeometry args={[depth, height, 0.15]} />
-                <meshStandardMaterial color="#f2e9e4" />
+                <meshStandardMaterial color="#f8f8f8" />
             </mesh>
 
             {/* Central Seating Area */}
