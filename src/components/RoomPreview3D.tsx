@@ -1,3 +1,4 @@
+
 import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -10,13 +11,14 @@ interface RoomPreview3DProps {
   deceasedInfo?: DeceasedInfo;
 }
 
-// TV component with a black frame - remains unchanged
-const TV = ({ texture, position }: { 
+// TV component with a black frame - now accepts rotation
+const TV = ({ texture, position, rotation = [0, 0, 0] }: { 
   texture: THREE.CanvasTexture | null; 
   position: [number, number, number];
+  rotation?: [number, number, number];
 }) => {
   return (
-    <group position={position}>
+    <group position={position} rotation={rotation}>
       {/* TV Frame (black bezel) - reduced size */}
       <mesh position={[0, 0, 0.01]}>
         <planeGeometry args={[2.2, 1.3]} />
@@ -44,17 +46,12 @@ const TV = ({ texture, position }: {
   );
 };
 
-
-// Modern, aesthetic lobby room
+// Modern, aesthetic lobby with 3 walls and central seating
 const LobbyRoom = () => {
     // Room dimensions
-    const width = 12;
-    const depth = 16;
+    const width = 20;
+    const depth = 20;
     const height = 5;
-
-    // Entrance dimensions
-    const doorWidth = 4;
-    const doorHeight = 3;
 
     return (
         <group>
@@ -70,27 +67,10 @@ const LobbyRoom = () => {
                 <meshStandardMaterial color="#f2e9e4" />
             </mesh>
             
-            {/* Back Wall (TV wall) - accent wall */}
+            {/* Back Wall (TV wall) */}
             <mesh position={[0, height / 2, -depth / 2]}>
                 <boxGeometry args={[width, height, 0.15]} />
                 <meshStandardMaterial color="#9a8c98" />
-            </mesh>
-
-            {/* Front Wall with entrance */}
-            {/* Left part of front wall */}
-            <mesh position={[- (doorWidth / 2) - (width / 2 - doorWidth / 2) / 2, height / 2, depth / 2]}>
-                <boxGeometry args={[width / 2 - doorWidth / 2, height, 0.15]} />
-                <meshStandardMaterial color="#c9ada7" />
-            </mesh>
-            {/* Right part of front wall */}
-             <mesh position={[(doorWidth / 2) + (width / 2 - doorWidth / 2) / 2, height / 2, depth / 2]}>
-                <boxGeometry args={[width / 2 - doorWidth / 2, height, 0.15]} />
-                <meshStandardMaterial color="#c9ada7" />
-            </mesh>
-             {/* Lintel (above door) */}
-             <mesh position={[0, doorHeight + (height - doorHeight) / 2, depth / 2]}>
-                <boxGeometry args={[doorWidth, height - doorHeight, 0.15]} />
-                <meshStandardMaterial color="#c9ada7" />
             </mesh>
 
             {/* Side Walls */}
@@ -103,64 +83,70 @@ const LobbyRoom = () => {
                 <meshStandardMaterial color="#f2e9e4" />
             </mesh>
 
-            {/* Reception Desk */}
-            <group position={[4, 0, 5]}>
-                <mesh position={[0, 0.6, 0]}>
-                    <boxGeometry args={[2.5, 1.2, 0.7]} />
-                    <meshStandardMaterial color="#22223b" />
-                </mesh>
-                <mesh position={[0, 1.25, -0.3]}>
-                    <boxGeometry args={[2.5, 0.1, 0.2]} />
-                    <meshStandardMaterial color="#f2e9e4" />
-                </mesh>
-            </group>
-
-            {/* Seating Benches (left wall) */}
-            <group position={[-width / 2 + 0.5, 0, 0]}>
-                {/* Bench 1 */}
-                <group position={[0, 0, -3]}>
-                    <mesh position={[0, 0.3, 0]}>
-                        <boxGeometry args={[0.8, 0.6, 3]} />
-                        <meshStandardMaterial color="#4a4e69" />
+            {/* Central Seating Area */}
+            <group position={[0, 0, 2]}>
+                {/* Coffee Table */}
+                <group position={[0, 0.3, 0]}>
+                    <mesh position={[0, 0.1, 0]}>
+                        <boxGeometry args={[3.5, 0.1, 2]} />
+                        <meshStandardMaterial color="#22223b" />
                     </mesh>
-                    <mesh position={[0.45, 0.8, 0]}>
-                        <boxGeometry args={[0.1, 0.4, 3]} />
-                        <meshStandardMaterial color="#9a8c98" />
+                    <mesh position={[-1.5, -0.15, 0.75]}>
+                        <boxGeometry args={[0.2, 0.5, 0.2]} />
+                        <meshStandardMaterial color="#1a1a1a" />
                     </mesh>
-                </group>
-                {/* Bench 2 */}
-                <group position={[0, 0, 3]}>
-                    <mesh position={[0, 0.3, 0]}>
-                        <boxGeometry args={[0.8, 0.6, 3]} />
-                        <meshStandardMaterial color="#4a4e69" />
+                     <mesh position={[1.5, -0.15, 0.75]}>
+                        <boxGeometry args={[0.2, 0.5, 0.2]} />
+                        <meshStandardMaterial color="#1a1a1a" />
                     </mesh>
-                    <mesh position={[0.45, 0.8, 0]}>
-                        <boxGeometry args={[0.1, 0.4, 3]} />
-                        <meshStandardMaterial color="#9a8c98" />
+                     <mesh position={[-1.5, -0.15, -0.75]}>
+                        <boxGeometry args={[0.2, 0.5, 0.2]} />
+                        <meshStandardMaterial color="#1a1a1a" />
+                    </mesh>
+                     <mesh position={[1.5, -0.15, -0.75]}>
+                        <boxGeometry args={[0.2, 0.5, 0.2]} />
+                        <meshStandardMaterial color="#1a1a1a" />
                     </mesh>
                 </group>
-            </group>
 
-            {/* Plant */}
-            <group position={[-4.5, 0, 6]}>
-                <mesh position={[0, 0.5, 0]}>
-                    <cylinderGeometry args={[0.4, 0.5, 1, 32]} />
-                    <meshStandardMaterial color="#22223b" />
-                </mesh>
-                <mesh position={[0, 1.2, 0]}>
-                    <sphereGeometry args={[0.6, 32, 16]} />
-                    <meshStandardMaterial color="#6a994e" />
-                </mesh>
+                {/* Long Sofas */}
+                {[
+                    { pos: [0, 0, -3], rot: [0, 0, 0] }, // Back sofa
+                    { pos: [-4, 0, 1.5], rot: [0, Math.PI / 2, 0] }, // Left sofa
+                    { pos: [4, 0, 1.5], rot: [0, -Math.PI / 2, 0] }, // Right sofa
+                ].map((sofa, index) => (
+                    <group key={index} position={sofa.pos as [number, number, number]} rotation={sofa.rot as [number, number, number]}>
+                        {/* Base */}
+                        <mesh position={[0, 0.4, 0]}>
+                            <boxGeometry args={[5, 0.8, 1.2]} />
+                            <meshStandardMaterial color="#4a4e69" />
+                        </mesh>
+                        {/* Backrest */}
+                        <mesh position={[0, 1, -0.5]}>
+                            <boxGeometry args={[5, 0.8, 0.2]} />
+                            <meshStandardMaterial color="#4a4e69" />
+                        </mesh>
+                        {/* Armrests */}
+                        <mesh position={[-2.4, 0.8, 0]}>
+                            <boxGeometry args={[0.2, 0.4, 1.2]} />
+                             <meshStandardMaterial color="#9a8c98" />
+                        </mesh>
+                         <mesh position={[2.4, 0.8, 0]}>
+                            <boxGeometry args={[0.2, 0.4, 1.2]} />
+                             <meshStandardMaterial color="#9a8c98" />
+                        </mesh>
+                    </group>
+                ))}
             </group>
         </group>
     );
 };
 
-// The camera controller - now looks at the TV on the back wall
+// The camera controller - now looks at the center of the room
 const CameraController = () => {
   const { camera } = useThree();
   useFrame(() => {
-    camera.lookAt(0, 2.5, -8);
+    camera.lookAt(0, 1.5, 0); // Looking at the center of the seating area
   });
   return null;
 };
@@ -189,6 +175,9 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
     }
   }, [texture]);
   
+  const roomWidth = 20;
+  const roomDepth = 20;
+  
   return (
     <div className="w-full h-[500px] bg-black relative">
       {deceasedInfo && (
@@ -200,21 +189,38 @@ const RoomPreview3D: React.FC<RoomPreview3DProps> = ({ deceasedInfo }) => {
       <Canvas shadows={true}>
         <Suspense fallback={<div>Loading 3D scene...</div>}>
           {/* Adjusted camera for a better view of the new lobby */}
-          <PerspectiveCamera makeDefault position={[0, 2.5, 10]} fov={60} />
+          <PerspectiveCamera makeDefault position={[0, 3.5, 12]} fov={60} />
           <CameraController />
           {/* Softer lighting for a more serene atmosphere */}
           <ambientLight intensity={0.8} />
           <directionalLight position={[0, 10, 15]} intensity={1.5} castShadow />
           <LobbyRoom />
-          {/* TV positioned on the back wall */}
-          <TV texture={texture} position={[0, 2.5, -7.9]} />
+
+          {/* TV on back wall */}
+          <TV texture={texture} position={[0, 2.5, -roomDepth / 2 + 0.1]} />
+
+          {/* TV on left wall */}
+          <TV 
+            texture={texture} 
+            position={[-roomWidth / 2 + 0.1, 2.5, 0]} 
+            rotation={[0, Math.PI / 2, 0]} 
+          />
+
+          {/* TV on right wall */}
+          <TV 
+            texture={texture} 
+            position={[roomWidth / 2 - 0.1, 2.5, 0]} 
+            rotation={[0, -Math.PI / 2, 0]}
+          />
+
           <OrbitControls 
             enableZoom={true} 
             enablePan={true}
+            target={[0, 1.5, 0]} // Set OrbitControls target to match camera lookAt
             minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 1.9}
-            minDistance={4}
-            maxDistance={20}
+            maxPolarAngle={Math.PI / 1.8}
+            minDistance={5}
+            maxDistance={25}
           />
         </Suspense>
       </Canvas>
