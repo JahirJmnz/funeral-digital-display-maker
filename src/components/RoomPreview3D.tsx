@@ -1,3 +1,4 @@
+
 import React, { Suspense, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -85,9 +86,9 @@ const FloralArrangement = ({ position }: { position: [number, number, number] })
 
     return (
       <group position={basePos}>
-        {/* Stem */}
-        <mesh position={[0, -0.12, 0]}>
-          <cylinderGeometry args={[0.004, 0.004, 0.24, 8]} />
+        {/* Stem - made taller */}
+        <mesh position={[0, -0.18, 0]}>
+          <cylinderGeometry args={[0.004, 0.004, 0.36, 8]} />
           <meshStandardMaterial color="#3c6b43" roughness={0.9} />
         </mesh>
         {petals}
@@ -140,16 +141,16 @@ const FloralArrangement = ({ position }: { position: [number, number, number] })
         ))}
       </group>
 
-      {/* White Flower Clusters - Mix of roses and lilies */}
+      {/* White Flower Clusters - Mix of roses and lilies - made taller */}
       {[
-        [0, vaseHeight + 0.16, 0, 'rose'],
-        [0.11, vaseHeight + 0.13, 0.06, 'lily'],
-        [-0.09, vaseHeight + 0.15, -0.06, 'rose'],
-        [0.06, vaseHeight + 0.11, -0.11, 'lily'],
-        [-0.06, vaseHeight + 0.12, 0.11, 'rose'],
-        [0.09, vaseHeight + 0.14, 0.09, 'lily'],
-        [-0.11, vaseHeight + 0.12, -0.09, 'rose'],
-        [0.05, vaseHeight + 0.17, 0.05, 'rose'],
+        [0, vaseHeight + 0.24, 0, 'rose'],
+        [0.11, vaseHeight + 0.21, 0.06, 'lily'],
+        [-0.09, vaseHeight + 0.23, -0.06, 'rose'],
+        [0.06, vaseHeight + 0.19, -0.11, 'lily'],
+        [-0.06, vaseHeight + 0.20, 0.11, 'rose'],
+        [0.09, vaseHeight + 0.22, 0.09, 'lily'],
+        [-0.11, vaseHeight + 0.20, -0.09, 'rose'],
+        [0.05, vaseHeight + 0.25, 0.05, 'rose'],
       ].map(([x, y, z, type], i) => (
         <group key={i}>
           {createFlower([x as number, y as number, z as number], type as 'rose' | 'lily')}
