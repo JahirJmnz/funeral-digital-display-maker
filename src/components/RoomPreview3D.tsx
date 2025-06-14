@@ -1,3 +1,4 @@
+
 import React, { Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -62,23 +63,62 @@ const FloralArrangement = ({ position }: { position: [number, number, number] })
         <meshStandardMaterial color="#2d6a4f" roughness={0.8} /> {/* Dark green for foliage */}
       </mesh>
 
-      {/* Flowers - soft colors */}
-      <mesh position={[0, vaseHeight + 0.1, 0]}>
-        <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color="#fff1e6" /> {/* Off-white */}
-      </mesh>
-      <mesh position={[0.1, vaseHeight + 0.05, 0.05]}>
-        <sphereGeometry args={[0.08, 16, 16]} />
-        <meshStandardMaterial color="#fde2e4" /> {/* Soft pink */}
-      </mesh>
-      <mesh position={[-0.08, vaseHeight + 0.03, -0.05]}>
-        <sphereGeometry args={[0.09, 16, 16]} />
-        <meshStandardMaterial color="#fff1e6" /> {/* Off-white */}
-      </mesh>
-      <mesh position={[0.05, vaseHeight + 0.05, -0.1]}>
-        <sphereGeometry args={[0.07, 16, 16]} />
-        <meshStandardMaterial color="#fde2e4" /> {/* Soft pink */}
-      </mesh>
+      {/* White Flower Clusters */}
+      {/* Cluster 1 */}
+      <group position={[0, vaseHeight + 0.1, 0]}>
+        <mesh>
+          <sphereGeometry args={[0.07, 8, 8]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
+        </mesh>
+        <mesh position={[0.03, 0.01, 0.03]}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
+        </mesh>
+      </group>
+      {/* Cluster 2 */}
+      <group position={[0.1, vaseHeight + 0.07, 0.05]}>
+        <mesh>
+          <sphereGeometry args={[0.07, 8, 8]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
+        </mesh>
+        <mesh position={[-0.03, -0.01, -0.02]}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
+        </mesh>
+      </group>
+      {/* Cluster 3 */}
+      <group position={[-0.08, vaseHeight + 0.08, -0.05]}>
+        <mesh>
+          <sphereGeometry args={[0.07, 8, 8]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
+        </mesh>
+        <mesh position={[0.03, 0.01, -0.03]}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
+        </mesh>
+      </group>
+      {/* Cluster 4 */}
+      <group position={[0.05, vaseHeight + 0.05, -0.1]}>
+        <mesh>
+          <sphereGeometry args={[0.06, 8, 8]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
+        </mesh>
+        <mesh position={[-0.02, 0.01, 0.03]}>
+          <sphereGeometry args={[0.04, 8, 8]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
+        </mesh>
+      </group>
+      {/* Cluster 5 */}
+      <group position={[-0.05, vaseHeight + 0.05, 0.1]}>
+        <mesh>
+          <sphereGeometry args={[0.06, 8, 8]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
+        </mesh>
+        <mesh position={[0.02, -0.01, -0.03]}>
+          <sphereGeometry args={[0.04, 8, 8]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.5} />
+        </mesh>
+      </group>
     </group>
   );
 };
