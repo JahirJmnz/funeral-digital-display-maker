@@ -12,6 +12,7 @@ interface Screen {
   name: string;
   location: string;
   hasContent: boolean;
+  imageUrl?: string;
 }
 
 export default function Dashboard() {
@@ -20,12 +21,47 @@ export default function Dashboard() {
   
   // Estado para las pantallas disponibles (simuladas)
   const [screens, setScreens] = useState<Screen[]>([
-    { id: "screen1", name: "Pantalla Lobby Principal", location: "Recepción", hasContent: true },
-    { id: "screen2", name: "Pantalla Sala Esperanza", location: "Sala Esperanza", hasContent: false },
-    { id: "screen3", name: "Pantalla Sala Paz", location: "Sala Paz", hasContent: true },
-    { id: "screen4", name: "Pantalla Sala Serenidad", location: "Sala Serenidad", hasContent: false },
-    { id: "screen5", name: "Pantalla Capilla", location: "Capilla", hasContent: true },
-    { id: "screen6", name: "Pantalla Cafetería", location: "Cafetería", hasContent: false }
+    { 
+      id: "screen1", 
+      name: "Pantalla Lobby Principal", 
+      location: "Recepción", 
+      hasContent: true,
+      imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face"
+    },
+    { 
+      id: "screen2", 
+      name: "Pantalla Sala Esperanza", 
+      location: "Sala Esperanza", 
+      hasContent: false 
+    },
+    { 
+      id: "screen3", 
+      name: "Pantalla Sala Paz", 
+      location: "Sala Paz", 
+      hasContent: true,
+      imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=300&fit=crop&crop=face"
+    },
+    { 
+      id: "screen4", 
+      name: "Pantalla Sala Serenidad", 
+      location: "Sala Serenidad", 
+      hasContent: false,
+      imageUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=300&fit=crop&crop=face"
+    },
+    { 
+      id: "screen5", 
+      name: "Pantalla Capilla", 
+      location: "Capilla", 
+      hasContent: true,
+      imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop&crop=face"
+    },
+    { 
+      id: "screen6", 
+      name: "Pantalla Cafetería", 
+      location: "Cafetería", 
+      hasContent: false,
+      imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop&crop=face"
+    }
   ]);
 
   // Función para editar una pantalla (navegar al editor)
@@ -62,8 +98,16 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {screens.map((screen) => (
             <Card key={screen.id} className="overflow-hidden">
-              <div className="h-36 bg-gray-200 flex items-center justify-center">
-                <Monitor className="h-12 w-12 text-gray-400" />
+              <div className="h-36 bg-gray-200 flex items-center justify-center relative">
+                {screen.imageUrl ? (
+                  <img 
+                    src={screen.imageUrl} 
+                    alt={`Vista previa de ${screen.name}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Monitor className="h-12 w-12 text-gray-400" />
+                )}
               </div>
               <CardContent className="p-4">
                 <h3 className="text-base font-medium">{screen.name}</h3>
